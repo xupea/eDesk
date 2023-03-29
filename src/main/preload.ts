@@ -24,7 +24,6 @@ const electronHandler = {
 
 async function getScreenStream() {
   const deviceId = await ipcRenderer.invoke('source');
-  console.log(deviceId);
   return navigator.mediaDevices.getUserMedia({
     audio: false,
     // video: {
@@ -53,6 +52,12 @@ async function createAnswer(offer: RTCSessionDescriptionInit) {
 
   // step3
   rtcPeerConnect.addEventListener('icecandidate', (e) => {
+    if (!e || !e.candidate) {
+      return;
+    }
+
+    console.log('icecandidate', e);
+
     ipcRenderer.send('forward', 'puppet-candidate', { ...e.candidate });
   });
 
