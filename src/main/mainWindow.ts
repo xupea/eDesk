@@ -2,13 +2,30 @@
 
 import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
+import { autoUpdater } from 'electron-updater';
+import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
-let mainWindow: BrowserWindow | null = null;
+class AppUpdater {
+  constructor() {
+    log.transports.file.level = 'info';
+    autoUpdater.logger = log;
+    autoUpdater.checkForUpdatesAndNotify();
+  }
+}
+
+if (process.env.NODE_ENV === 'production') {
+  const sourceMapSupport = require('source-map-support');
+  sourceMapSupport.install();
+}
 
 const isDebug =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
+
+if (isDebug) {
+  require('electron-debug')();
+}
 
 const installExtensions = async () => {
   const installer = require('electron-devtools-assembler');
@@ -23,7 +40,9 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
-const createControlWindow = async () => {
+let mainWindow: BrowserWindow | null = null;
+
+const createMainWindow = async () => {
   if (isDebug) {
     await installExtensions();
   }
@@ -73,6 +92,16 @@ const createControlWindow = async () => {
     shell.openExternal(edata.url);
     return { action: 'deny' };
   });
+
+  // Remove this if your app does not use auto updates
+  // eslint-disable-next-line
+  new AppUpdater();
+
+  return mainWindow;
 };
 
-export default createControlWindow;
+const sendMainWindow = async (channel: string, ...args: any[]) => {
+  mainWindow?.webContents.send(channel, ...args);
+};
+
+export { createMainWindow, sendMainWindow };
