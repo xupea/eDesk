@@ -23,8 +23,8 @@ const createControlWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
-        ? path.join(__dirname, 'preload.js')
-        : path.join(__dirname, '../../.erb/dll/preload.js'),
+        ? path.join(__dirname, 'preloadControl.js')
+        : path.join(__dirname, '../../.erb/dll/preloadControl.js'),
     },
   });
 
@@ -50,7 +50,6 @@ const createControlWindow = async () => {
 };
 
 const sendControlWindow = async (channel: string, ...args: any[]) => {
-  console.log(controlWindow);
   controlWindow?.webContents.send(channel, ...args);
 };
 

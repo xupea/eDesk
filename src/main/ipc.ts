@@ -1,32 +1,53 @@
 import { ipcMain, desktopCapturer } from 'electron';
 import { createControlWindow, sendControlWindow } from './controlWindow';
 import { sendMainWindow } from './mainWindow';
+import signal from './signal';
 
-export default function ipc() {
-  ipcMain.on('control', async (event, remoteCode: string) => {
-    sendMainWindow('control-state-change', remoteCode, 1);
+export default async function ipc() {
+  ipcMain.on('control', async (event, remote: string) => {
+    sendMainWindow('control-state-change', 'data.remote', 1);
+    createControlWindow();
+    // signal.send('control', { remote });
+  });
+
+  signal.on('controlled', (data) => {
+    sendMainWindow('control-state-change', data.remote, 1);
     createControlWindow();
   });
 
-  ipcMain.on('capture', async () => {
-    desktopCapturer
-      .getSources({ types: ['screen'] })
-      .then(async (sources) => {
-        // eslint-disable-next-line no-restricted-syntax, promise/always-return
-        for (const source of sources) {
-          if (source.name === 'Entire screen') {
-            sendControlWindow('source', source.id);
-            return;
-          }
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  signal.on('be-controlled', (data) => {
+    sendMainWindow('control-state-change', data.remote, 2);
   });
 
-  ipcMain.handle('login', async () => {
-    const code = Math.floor(Math.random() * (999999 - 100000)) + 100000;
+  signal.on('offer', (data) => {
+    sendMainWindow('offer', data);
+  });
+
+  signal.on('answer', (data) => {
+    sendControlWindow('answer', data);
+  });
+
+  signal.on('puppet-candidate', (data) => {
+    sendControlWindow('candidate', data);
+  });
+
+  signal.on('control-candidate', (data) => {
+    sendMainWindow('candidate', data);
+  });
+
+  ipcMain.handle('login', async (e, data) => {
+    await signal.connect(data);
+    const { code } = await signal.invoke('login', null, 'logined');
     return code;
+  });
+
+  ipcMain.handle('source', async () => {
+    const sources = await desktopCapturer.getSources({ types: ['screen'] });
+    return sources[0].id;
+  });
+
+  // 转发
+  ipcMain.on('forward', (e, event, data) => {
+    signal.send('forward', { event, data });
   });
 }

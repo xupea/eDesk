@@ -31,7 +31,7 @@ app
   .then(async () => {
     mainWindow = await createMainWindow();
 
-    ipc();
+    await ipc();
 
     app.on('activate', async () => {
       // On macOS it's common to re-create a window in the app when the
