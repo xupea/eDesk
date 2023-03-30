@@ -45,7 +45,7 @@ class SignalEventEmitter extends EventEmitter {
   }
 }
 
-const socket = io('wss://192.168.0.109', {
+const socket = io('wss://39.108.191.135', {
   rejectUnauthorized: false,
   autoConnect: false,
 });

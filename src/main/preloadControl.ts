@@ -23,7 +23,18 @@ const electronHandler = {
 };
 
 // 控制端创建 offer 给信令服务
-const rtcPeerConnection = new RTCPeerConnection();
+const rtcPeerConnection = new RTCPeerConnection({
+  iceServers: [
+    {
+      urls: 'stun:relay1.expressturn.com:3478',
+    },
+    {
+      urls: 'turn:relay1.expressturn.com:3478',
+      username: 'efP60V8AT2HO489AX5',
+      credential: 'oJg6OV53zxT0NZwk',
+    },
+  ],
+});
 
 async function createOffer() {
   const offer = await rtcPeerConnection.createOffer({
@@ -78,12 +89,58 @@ ipcRenderer.on('candidate', (e, candidate) => {
 
 // step3
 rtcPeerConnection.addEventListener('icecandidate', (e) => {
-  ipcRenderer.send('forward', 'control-candidate', { ...e.candidate });
+  if (!e.candidate) {
+    return;
+  }
+
+  if (
+    e.candidate.type !== 'relay' &&
+    e.candidate.address !== '192.168.0.109' &&
+    e.candidate.relatedAddress !== '192.168.0.109'
+  ) {
+    return;
+  }
+
+  const {
+    address,
+    candidate,
+    component,
+    foundation,
+    port,
+    priority,
+    protocol,
+    relatedAddress,
+    relatedPort,
+    sdpMLineIndex,
+    sdpMid,
+    tcpType,
+    type,
+    usernameFragment,
+  } = e.candidate;
+  ipcRenderer.send('forward', 'control-candidate', {
+    address,
+    candidate,
+    component,
+    foundation,
+    port,
+    priority,
+    protocol,
+    relatedAddress,
+    relatedPort,
+    sdpMLineIndex,
+    sdpMid,
+    tcpType,
+    type,
+    usernameFragment,
+  });
+});
+
+rtcPeerConnection.addEventListener('icecandidateerror', (e) => {
+  console.log('ICE state error event: ', e);
 });
 
 // step4
 rtcPeerConnection.addEventListener('track', (e) => {
-  console.log('e', e);
   const videoElement = document.getElementById('video') as HTMLVideoElement;
   videoElement.srcObject = e.streams[0];
   videoElement.addEventListener('loadedmetadata', () => {

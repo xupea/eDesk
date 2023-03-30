@@ -46,106 +46,116 @@ async function getScreenStream() {
   });
 }
 
+const rtcPeerConnection = new RTCPeerConnection({
+  iceServers: [
+    {
+      urls: 'stun:relay1.expressturn.com:3478',
+    },
+    {
+      urls: 'turn:relay1.expressturn.com:3478',
+      username: 'efP60V8AT2HO489AX5',
+      credential: 'oJg6OV53zxT0NZwk',
+    },
+  ],
+});
 // step2
 async function createAnswer(offer: RTCSessionDescriptionInit) {
-  const rtcPeerConnect = new RTCPeerConnection();
-
   // step3
-  rtcPeerConnect.addEventListener('icecandidate', (e) => {
-    console.log('preload, icecandidate', e)
-
-    if (!e || !e.candidate) {
+  rtcPeerConnection.addEventListener('icecandidate', (e) => {
+    if (!e.candidate) {
       return;
     }
 
-    if (e instanceof RTCPeerConnectionIceEvent) {
-      const {
-        address,
-        candidate,
-        component,
-        foundation,
-        port,
-        priority,
-        protocol,
-        relatedAddress,
-        relatedPort,
-        sdpMLineIndex,
-        sdpMid,
-        tcpType,
-        type,
-        usernameFragment,
-      } = e.candidate;
-
-      ipcRenderer.send('forward', 'puppet-candidate', {
-        address,
-        candidate,
-        component,
-        foundation,
-        port,
-        priority,
-        protocol,
-        relatedAddress,
-        relatedPort,
-        sdpMLineIndex,
-        sdpMid,
-        tcpType,
-        type,
-        usernameFragment,
-      });
-    } else {
-      const {
-        address,
-        candidate,
-        component,
-        foundation,
-        port,
-        priority,
-        protocol,
-        relatedAddress,
-        relatedPort,
-        sdpMLineIndex,
-        sdpMid,
-        tcpType,
-        type,
-        usernameFragment,
-      } = e;
-
-      ipcRenderer.send('forward', 'puppet-candidate', {
-        address,
-        candidate,
-        component,
-        foundation,
-        port,
-        priority,
-        protocol,
-        relatedAddress,
-        relatedPort,
-        sdpMLineIndex,
-        sdpMid,
-        tcpType,
-        type,
-        usernameFragment,
-      });
+    if (
+      e.candidate.type !== 'relay' &&
+      e.candidate.address !== '10.0.0.204' &&
+      e.candidate.relatedAddress !== '10.0.0.204'
+    ) {
+      return;
     }
+
+    console.log('preload, icecandidate', e.candidate);
+
+    const {
+      address,
+      candidate,
+      component,
+      foundation,
+      port,
+      priority,
+      protocol,
+      relatedAddress,
+      relatedPort,
+      sdpMLineIndex,
+      sdpMid,
+      tcpType,
+      type,
+      usernameFragment,
+    } = e.candidate;
+
+    ipcRenderer.send('forward', 'puppet-candidate', {
+      address,
+      candidate,
+      component,
+      foundation,
+      port,
+      priority,
+      protocol,
+      relatedAddress,
+      relatedPort,
+      sdpMLineIndex,
+      sdpMid,
+      tcpType,
+      type,
+      usernameFragment,
+    });
   });
 
   const gumSteam = await getScreenStream();
   // eslint-disable-next-line no-restricted-syntax
   for (const track of gumSteam.getTracks()) {
-    rtcPeerConnect.addTrack(track, gumSteam);
+    rtcPeerConnection.addTrack(track, gumSteam);
   }
 
-  await rtcPeerConnect.setRemoteDescription(offer);
+  await rtcPeerConnection.setRemoteDescription(offer);
 
-  await rtcPeerConnect.setLocalDescription(await rtcPeerConnect.createAnswer());
+  await rtcPeerConnection.setLocalDescription(
+    await rtcPeerConnection.createAnswer()
+  );
 
-  const { localDescription } = rtcPeerConnect;
+  const { localDescription } = rtcPeerConnection;
 
   ipcRenderer.send('forward', 'answer', {
     type: localDescription?.type,
     sdp: localDescription?.sdp,
   });
 }
+
+let candidates = [];
+
+async function addCandidate(candidate) {
+  if (!candidate || !candidate.type) {
+    return;
+  }
+
+  candidates.push(candidate);
+
+  if (
+    rtcPeerConnection.remoteDescription &&
+    rtcPeerConnection.remoteDescription.type
+  ) {
+    for (let i = 0; i < candidates.length; i++) {
+      await rtcPeerConnection.addIceCandidate(
+        new RTCIceCandidate(candidates[i])
+      );
+    }
+    candidates = [];
+  }
+}
+
+ipcRenderer.on('candidate', (e, candidate) => {
+  addCandidate(candidate);
+});
 
 // step1
 ipcRenderer.on('offer', (e, offer) => {
