@@ -52,13 +52,81 @@ async function createAnswer(offer: RTCSessionDescriptionInit) {
 
   // step3
   rtcPeerConnect.addEventListener('icecandidate', (e) => {
+    console.log('preload, icecandidate', e)
+
     if (!e || !e.candidate) {
       return;
     }
 
-    console.log('icecandidate', e);
+    if (e instanceof RTCPeerConnectionIceEvent) {
+      const {
+        address,
+        candidate,
+        component,
+        foundation,
+        port,
+        priority,
+        protocol,
+        relatedAddress,
+        relatedPort,
+        sdpMLineIndex,
+        sdpMid,
+        tcpType,
+        type,
+        usernameFragment,
+      } = e.candidate;
 
-    ipcRenderer.send('forward', 'puppet-candidate', { ...e.candidate });
+      ipcRenderer.send('forward', 'puppet-candidate', {
+        address,
+        candidate,
+        component,
+        foundation,
+        port,
+        priority,
+        protocol,
+        relatedAddress,
+        relatedPort,
+        sdpMLineIndex,
+        sdpMid,
+        tcpType,
+        type,
+        usernameFragment,
+      });
+    } else {
+      const {
+        address,
+        candidate,
+        component,
+        foundation,
+        port,
+        priority,
+        protocol,
+        relatedAddress,
+        relatedPort,
+        sdpMLineIndex,
+        sdpMid,
+        tcpType,
+        type,
+        usernameFragment,
+      } = e;
+
+      ipcRenderer.send('forward', 'puppet-candidate', {
+        address,
+        candidate,
+        component,
+        foundation,
+        port,
+        priority,
+        protocol,
+        relatedAddress,
+        relatedPort,
+        sdpMLineIndex,
+        sdpMid,
+        tcpType,
+        type,
+        usernameFragment,
+      });
+    }
   });
 
   const gumSteam = await getScreenStream();
