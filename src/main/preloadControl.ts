@@ -22,7 +22,6 @@ const electronHandler = {
   },
 };
 
-// 控制端创建 offer 给信令服务
 const rtcPeerConnection = new RTCPeerConnection({
   iceServers: [
     {
@@ -36,6 +35,23 @@ const rtcPeerConnection = new RTCPeerConnection({
   ],
 });
 
+const dataChannel = rtcPeerConnection.createDataChannel('robotchannel', {
+  ordered: false,
+});
+
+dataChannel.addEventListener('open', () => {
+  console.log('control datachannel is oepn');
+});
+
+dataChannel.addEventListener('message', (event) => {
+  console.log(event.data);
+});
+
+dataChannel.addEventListener('error', (error) => {
+  console.log('dataChannel error', error);
+});
+
+// 控制端创建 offer 给信令服务
 async function createOffer() {
   const offer = await rtcPeerConnection.createOffer({
     offerToReceiveAudio: false,
@@ -139,6 +155,36 @@ rtcPeerConnection.addEventListener('track', (e) => {
   videoElement.addEventListener('loadedmetadata', () => {
     videoElement.play();
   });
+});
+
+window.addEventListener('keydown', (event) => {
+  const { key, shiftKey, code, metaKey, altKey, ctrlKey } = event;
+  console.log(key, shiftKey, code, metaKey, altKey, ctrlKey);
+  const data = { key, shiftKey, code, metaKey, altKey, ctrlKey };
+
+  if (dataChannel.readyState === 'open') {
+    dataChannel.send(
+      JSON.stringify({
+        type: 'key',
+        data,
+      })
+    );
+  }
+});
+
+window.addEventListener('mouseup', (event) => {
+  const { clientX, clientY, button } = event;
+  console.log(clientX, clientY, button);
+  const data = { clientX, clientY, button };
+
+  if (dataChannel.readyState === 'open') {
+    dataChannel.send(
+      JSON.stringify({
+        type: 'mouser',
+        data,
+      })
+    );
+  }
 });
 
 contextBridge.exposeInMainWorld('electron', electronHandler);
