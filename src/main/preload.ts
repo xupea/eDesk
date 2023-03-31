@@ -24,6 +24,19 @@ const electronHandler = {
 
 async function getScreenStream() {
   const deviceId = await ipcRenderer.invoke('source');
+  // this is only supported in v22
+  // return navigator.mediaDevices.getDisplayMedia({
+  //   audio: false,
+  //   video: {
+  //     deviceId,
+  //     width: {
+  //       max: window.screen.width,
+  //     },
+  //     height: {
+  //       max: window.screen.height,
+  //     },
+  //   },
+  // });
   return navigator.mediaDevices.getUserMedia({
     audio: false,
     // video: {

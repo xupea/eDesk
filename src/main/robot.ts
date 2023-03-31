@@ -22,7 +22,10 @@ function typeString(data) {
   if (ctrlKey) {
     modifiers.push('ctrl');
   }
-  robot.keyTap(key, modifiers);
+
+  const parsedKey = key.length > 1 ? key.toLowerCase() : key;
+
+  robot.keyTap(parsedKey, modifiers);
 }
 
 export { click, typeString };
