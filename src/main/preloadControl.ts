@@ -180,7 +180,7 @@ window.addEventListener('mouseup', (event) => {
   if (dataChannel.readyState === 'open') {
     dataChannel.send(
       JSON.stringify({
-        type: 'mouser',
+        type: 'mouse',
         data,
       })
     );
