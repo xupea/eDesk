@@ -26,12 +26,12 @@ const electronHandler = {
 const rtcPeerConnection = new RTCPeerConnection({
   iceServers: [
     {
-      urls: 'stun:relay1.expressturn.com:3478',
+      urls: 'stun:39.108.191.135:3478',
     },
     {
-      urls: 'turn:relay1.expressturn.com:3478',
-      username: 'efP60V8AT2HO489AX5',
-      credential: 'oJg6OV53zxT0NZwk',
+      urls: 'turn:39.108.191.135:3478',
+      username: 'ninefingers',
+      credential: 'youhavetoberealistic',
     },
   ],
 });
