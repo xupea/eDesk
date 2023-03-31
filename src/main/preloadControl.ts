@@ -93,14 +93,6 @@ rtcPeerConnection.addEventListener('icecandidate', (e) => {
     return;
   }
 
-  if (
-    e.candidate.type !== 'relay' &&
-    e.candidate.address !== '192.168.0.109' &&
-    e.candidate.relatedAddress !== '192.168.0.109'
-  ) {
-    return;
-  }
-
   const {
     address,
     candidate,
@@ -117,6 +109,7 @@ rtcPeerConnection.addEventListener('icecandidate', (e) => {
     type,
     usernameFragment,
   } = e.candidate;
+
   ipcRenderer.send('forward', 'control-candidate', {
     address,
     candidate,
@@ -142,7 +135,7 @@ rtcPeerConnection.addEventListener('icecandidateerror', (e) => {
 // step4
 rtcPeerConnection.addEventListener('track', (e) => {
   const videoElement = document.getElementById('video') as HTMLVideoElement;
-  videoElement.srcObject = e.streams[0];
+  [videoElement.srcObject] = e.streams;
   videoElement.addEventListener('loadedmetadata', () => {
     videoElement.play();
   });

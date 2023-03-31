@@ -2,7 +2,7 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
-body {
+.mainContainer {
   position: relative;
   color: white;
   height: 100vh;
@@ -17,6 +17,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.videoContainer {
+
 }
 
 .login {

@@ -48,7 +48,7 @@ function Home() {
   }, []);
 
   return (
-    <div>
+    <div className="mainContainer">
       {isLogin ? (
         <div>
           <div>{controlText}</div>
@@ -85,7 +85,7 @@ function Control() {
   }, []);
 
   return (
-    <div>
+    <div className="videoContainer">
       <video id="video" />
     </div>
   );

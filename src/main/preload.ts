@@ -66,16 +66,6 @@ async function createAnswer(offer: RTCSessionDescriptionInit) {
       return;
     }
 
-    if (
-      e.candidate.type !== 'relay' &&
-      e.candidate.address !== '10.0.0.204' &&
-      e.candidate.relatedAddress !== '10.0.0.204'
-    ) {
-      return;
-    }
-
-    console.log('preload, icecandidate', e.candidate);
-
     const {
       address,
       candidate,
