@@ -54,13 +54,11 @@ export default async function ipc() {
 
   ipcMain.on('robot', (e, event, data) => {
     if (event === 'key') {
-      const { key } = data;
-      typeString(key);
+      typeString(data);
     }
 
     if (event === 'mouse') {
-      const { clientX, clientY } = data;
-      click(clientX, clientY);
+      click(data);
     }
   });
 }
