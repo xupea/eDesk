@@ -1,8 +1,8 @@
 import robot from 'robotjs';
 
 function click(data) {
-  const { clientX, clientY, button } = data;
-  robot.moveMouse(clientX, clientY);
+  const { pageX, pageY, button } = data;
+  robot.moveMouse(pageX, pageY);
   const type = button === 0 ? 'left' : 'right';
   robot.mouseClick(type);
 }

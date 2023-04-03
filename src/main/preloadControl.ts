@@ -173,9 +173,9 @@ window.addEventListener('keydown', (event) => {
 });
 
 window.addEventListener('mouseup', (event) => {
-  const { clientX, clientY, button } = event;
-  console.log(clientX, clientY, button);
-  const data = { clientX, clientY, button };
+  const { pageX, pageY, button } = event;
+  console.log(pageX, pageY, button);
+  const data = { pageX, pageY, button };
 
   if (dataChannel.readyState === 'open') {
     dataChannel.send(
