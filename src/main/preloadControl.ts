@@ -158,6 +158,14 @@ rtcPeerConnection.addEventListener('track', (e) => {
 });
 
 window.addEventListener('keydown', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+});
+
+window.addEventListener('keyup', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
   const { key, shiftKey, code, metaKey, altKey, ctrlKey } = event;
   console.log(key, shiftKey, code, metaKey, altKey, ctrlKey);
   const data = { key, shiftKey, code, metaKey, altKey, ctrlKey };
