@@ -1,10 +1,37 @@
 import robot from 'robotjs';
 
+enum MouseEventType {
+  CLICK,
+  DBLCLICK,
+  MOUSEDOWN,
+  MOUSEUP,
+  MOUSEMOVE,
+  MOUSELEAVE,
+  DRAGBEGIN,
+  DRAGMOVE,
+  DRAGEND,
+}
+
 function moveMouse(data) {
-  const { pageX, pageY, button } = data;
-  robot.moveMouse(pageX, pageY);
-  const type = button === 0 ? 'left' : 'right';
-  robot.mouseClick(type);
+  const { x, y, type } = data;
+
+  if (type === MouseEventType.MOUSEMOVE) {
+    robot.moveMouse(x, y);
+  }
+
+  if (type === MouseEventType.DRAGBEGIN) {
+    robot.mouseToggle('down');
+  }
+
+  if (type === MouseEventType.DRAGMOVE) {
+    robot.dragMouse(x, y);
+  }
+
+  if (type === MouseEventType.DRAGEND) {
+    robot.mouseToggle('up');
+  }
+
+  console.log('moveMouse', data);
 }
 
 function typeString(data) {

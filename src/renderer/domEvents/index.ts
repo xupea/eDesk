@@ -1,0 +1,154 @@
+const privateState: Record<string, any> = {};
+function setState(newState: Record<string, any>) {
+  Object.assign(privateState, newState);
+}
+function getState() {
+  return privateState;
+}
+
+enum MouseEventType {
+  CLICK,
+  DBLCLICK,
+  MOUSEDOWN,
+  MOUSEUP,
+  MOUSEMOVE,
+  MOUSELEAVE,
+  DRAGBEGIN,
+  DRAGMOVE,
+  DRAGEND,
+}
+
+const handleMouseEvent = (event: MouseEvent, type: MouseEventType) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  console.log(type, event.offsetX, event.offsetY);
+
+  const v = document.getElementById('video') as HTMLVideoElement;
+
+  const { offsetX, offsetY } = event;
+
+  const data = {
+    offsetX: Math.floor((offsetX * v.videoWidth) / v.clientWidth),
+    offsetY: Math.floor((offsetY * v.videoHeight) / v.clientHeight),
+  };
+
+  window.electron.ipcRenderer.mouseEvent({
+    type,
+    x: data.offsetX,
+    y: data.offsetY,
+  });
+};
+/**
+ * Handler for click event
+ */
+const handleClick = (event: MouseEvent) => {
+  const { mouseDownX, mouseDownY, mouseUpX, mouseUpY } = getState();
+
+  setState({
+    mouseDownX: undefined,
+    mouseDownY: undefined,
+    mouseUpX: undefined,
+    mouseUpY: undefined,
+  });
+
+  if (mouseDownX !== mouseUpX && mouseDownY !== mouseUpY) {
+    return;
+  }
+
+  const timer = setTimeout(() => {
+    const { preventClick } = getState();
+
+    if (!preventClick) {
+      handleMouseEvent(event, MouseEventType.CLICK);
+      setState({ preventClick: false });
+    }
+  }, 200);
+
+  setState({ preventTimer: timer });
+};
+/**
+ * Handler for double click event
+ */
+const handleDoubleClick = (event: MouseEvent) => {
+  clearTimeout(getState().preventTimer);
+  setState({ preventClick: true });
+  handleMouseEvent(event, MouseEventType.DBLCLICK);
+};
+/**
+ * Handler for mousedown event
+ */
+const handleMouseDown = (event: MouseEvent) => {
+  setState({
+    mouseDownX: event.x,
+    mouseDownY: event.y,
+  });
+};
+/**
+ * Handler for mouseup event
+ */
+const handleMouseUp = (event: MouseEvent) => {
+  setState({
+    mouseUpX: event.x,
+    mouseUpY: event.y,
+  });
+
+  const { mouseDownX, mouseDownY, mouseUpX, mouseUpY, isDragging } = getState();
+
+  if (!isDragging) {
+    return;
+  }
+
+  if (mouseDownX === mouseUpX && mouseDownY === mouseUpY) {
+    return;
+  }
+
+  handleMouseEvent(event, MouseEventType.DRAGEND);
+  setState({ isDragging: false });
+};
+
+const handleMouseMove = (event: MouseEvent) => {
+  const { isDragging, mouseDownX, mouseDownY, mouseUpX, mouseUpY } = getState();
+
+  if (
+    !isDragging &&
+    typeof mouseDownX === 'number' &&
+    typeof mouseDownY === 'number' &&
+    mouseUpX === undefined &&
+    mouseUpY === undefined &&
+    Math.abs(event.x - mouseDownX) > 0 &&
+    Math.abs(event.y - mouseDownY) > 0
+  ) {
+    handleMouseEvent(event, MouseEventType.DRAGBEGIN);
+    setState({ isDragging: true });
+  }
+
+  const { isDragging: isDraggingNew } = getState();
+
+  handleMouseEvent(
+    event,
+    isDraggingNew ? MouseEventType.DRAGMOVE : MouseEventType.MOUSEMOVE
+  );
+};
+
+const handleMouseLeave = (event: MouseEvent) => {};
+
+const defaultHandler = (event: Event) => event.preventDefault();
+
+export default function bindDOMEvents(el: HTMLElement) {
+  const events = {
+    click: handleClick,
+    mousedown: handleMouseDown,
+    mouseup: handleMouseUp,
+    mousemove: handleMouseMove,
+    mouseleave: handleMouseLeave,
+    dblclick: handleDoubleClick,
+    dragover: defaultHandler,
+    dragleave: defaultHandler,
+    dragend: defaultHandler,
+  };
+
+  Object.keys(events).forEach((event) => {
+    el.addEventListener(event, events[event]);
+  });
+}

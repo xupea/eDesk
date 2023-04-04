@@ -2,26 +2,6 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-const electronHandler = {
-  ipcRenderer: {
-    invoke(channel: string, ...args: any[]) {
-      return ipcRenderer.invoke(channel, ...args);
-    },
-    send(channel: string, ...args: any[]) {
-      ipcRenderer.send(channel, ...args);
-    },
-    on(
-      channel: string,
-      listener: (event: IpcRendererEvent, ...args: any[]) => void
-    ) {
-      ipcRenderer.on(channel, listener);
-    },
-    removeListener(channel: string, listener: (...args: any[]) => void) {
-      ipcRenderer.removeListener(channel, listener);
-    },
-  },
-};
-
 const rtcPeerConnection = new RTCPeerConnection({
   iceServers: [
     {
@@ -155,28 +135,6 @@ rtcPeerConnection.addEventListener('track', (e) => {
   videoElement.addEventListener('loadedmetadata', () => {
     videoElement.play();
   });
-  const videoEl = document.getElementById('video') as HTMLVideoElement;
-
-  videoEl.addEventListener('mousemove', (event) => {
-    const { offsetX, offsetY, button } = event;
-
-    const v = document.getElementById('video') as HTMLVideoElement;
-
-    const data = {
-      clientX: Math.floor((offsetX * v.videoWidth) / v.clientWidth),
-      clientY: Math.floor((offsetY * v.videoHeight) / v.clientHeight),
-      button,
-    };
-
-    if (dataChannel.readyState === 'open') {
-      dataChannel.send(
-        JSON.stringify({
-          type: 'mouse',
-          data,
-        })
-      );
-    }
-  });
 });
 
 window.addEventListener('keydown', (event) => {
@@ -220,6 +178,37 @@ window.addEventListener('keyup', (event) => {
 //     );
 //   }
 // });
+
+const electronHandler = {
+  ipcRenderer: {
+    invoke(channel: string, ...args: any[]) {
+      return ipcRenderer.invoke(channel, ...args);
+    },
+    send(channel: string, ...args: any[]) {
+      ipcRenderer.send(channel, ...args);
+    },
+    on(
+      channel: string,
+      listener: (event: IpcRendererEvent, ...args: any[]) => void
+    ) {
+      ipcRenderer.on(channel, listener);
+    },
+    removeListener(channel: string, listener: (...args: any[]) => void) {
+      ipcRenderer.removeListener(channel, listener);
+    },
+    mouseEvent(data) {
+      console.log(data);
+      if (dataChannel.readyState === 'open') {
+        dataChannel.send(
+          JSON.stringify({
+            type: 'mouse',
+            data,
+          })
+        );
+      }
+    },
+  },
+};
 
 contextBridge.exposeInMainWorld('electron', electronHandler);
 

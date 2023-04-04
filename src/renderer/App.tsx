@@ -1,7 +1,7 @@
-/* eslint-disable jsx-a11y/media-has-caption */
 import { useEffect, useState } from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { Input, Button } from 'antd';
+import Controller from './Controller';
 import 'antd/dist/reset.css';
 import './App.css';
 
@@ -79,20 +79,12 @@ function Home() {
   );
 }
 
-function Control() {
-  useEffect(() => {
-    // window.electron.createOffer();
-  }, []);
-
-  return <video id="video" />;
-}
-
 export default function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/control" element={<Control />} />
+        <Route path="/control" element={<Controller />} />
       </Routes>
     </Router>
   );
