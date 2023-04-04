@@ -1,6 +1,6 @@
 import robot from 'robotjs';
 
-function click(data) {
+function moveMouse(data) {
   const { pageX, pageY, button } = data;
   robot.moveMouse(pageX, pageY);
   const type = button === 0 ? 'left' : 'right';
@@ -28,4 +28,4 @@ function typeString(data) {
   robot.keyTap(parsedKey, modifiers);
 }
 
-export { click, typeString };
+export { moveMouse, typeString };

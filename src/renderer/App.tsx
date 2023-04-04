@@ -84,11 +84,7 @@ function Control() {
     // window.electron.createOffer();
   }, []);
 
-  return (
-    <div className="videoContainer">
-      <video id="video" />
-    </div>
-  );
+  return <video id="video" />;
 }
 
 export default function App() {

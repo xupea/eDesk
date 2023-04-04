@@ -2,7 +2,7 @@ import { ipcMain, desktopCapturer } from 'electron';
 import { createControlWindow, sendControlWindow } from './controlWindow';
 import { sendMainWindow } from './mainWindow';
 import signal from './signal';
-import { click, typeString } from './robot';
+import { moveMouse, typeString } from './robot';
 
 export default async function ipc() {
   ipcMain.on('control', async (event, remote: string) => {
@@ -58,7 +58,7 @@ export default async function ipc() {
     }
 
     if (event === 'mouse') {
-      click(data);
+      moveMouse(data);
     }
   });
 }

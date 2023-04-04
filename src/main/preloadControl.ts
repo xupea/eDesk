@@ -155,6 +155,28 @@ rtcPeerConnection.addEventListener('track', (e) => {
   videoElement.addEventListener('loadedmetadata', () => {
     videoElement.play();
   });
+  const videoEl = document.getElementById('video') as HTMLVideoElement;
+
+  videoEl.addEventListener('mousemove', (event) => {
+    const { offsetX, offsetY, button } = event;
+
+    const v = document.getElementById('video') as HTMLVideoElement;
+
+    const data = {
+      clientX: Math.floor((offsetX * v.videoWidth) / v.clientWidth),
+      clientY: Math.floor((offsetY * v.videoHeight) / v.clientHeight),
+      button,
+    };
+
+    if (dataChannel.readyState === 'open') {
+      dataChannel.send(
+        JSON.stringify({
+          type: 'mouse',
+          data,
+        })
+      );
+    }
+  });
 });
 
 window.addEventListener('keydown', (event) => {
@@ -180,20 +202,24 @@ window.addEventListener('keyup', (event) => {
   }
 });
 
-window.addEventListener('mouseup', (event) => {
-  const { pageX, pageY, button } = event;
-  console.log(pageX, pageY, button);
-  const data = { pageX, pageY, button };
+// window.addEventListener('mouseup', (event) => {
+//   const { pageX, pageY, button } = event;
+//   console.log(pageX, pageY, button);
+//   const data = { pageX, pageY, button };
 
-  if (dataChannel.readyState === 'open') {
-    dataChannel.send(
-      JSON.stringify({
-        type: 'mouse',
-        data,
-      })
-    );
-  }
-});
+//   const { videoWidth, videoHeight } = document.getElementById(
+//     'video'
+//   ) as HTMLVideoElement;
+
+//   if (dataChannel.readyState === 'open') {
+//     dataChannel.send(
+//       JSON.stringify({
+//         type: 'mouse',
+//         data,
+//       })
+//     );
+//   }
+// });
 
 contextBridge.exposeInMainWorld('electron', electronHandler);
 
