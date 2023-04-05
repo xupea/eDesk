@@ -1,3 +1,5 @@
+import { throttle } from '../utils';
+
 const privateState: Record<string, any> = {};
 function setState(newState: Record<string, any>) {
   Object.assign(privateState, newState);
@@ -18,7 +20,7 @@ enum MouseEventType {
   DRAGEND,
 }
 
-const handleMouseEvent = (event: MouseEvent, type: MouseEventType) => {
+const handleMouseEvent = throttle((event: MouseEvent, type: MouseEventType) => {
   event.preventDefault();
   event.stopPropagation();
 
@@ -38,7 +40,7 @@ const handleMouseEvent = (event: MouseEvent, type: MouseEventType) => {
     x: data.offsetX,
     y: data.offsetY,
   });
-};
+}, 30);
 /**
  * Handler for click event
  */

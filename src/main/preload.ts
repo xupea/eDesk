@@ -74,7 +74,6 @@ const rtcPeerConnection = new RTCPeerConnection({
 
 rtcPeerConnection.addEventListener('datachannel', (event) => {
   event.channel.addEventListener('message', (messageEvent) => {
-    console.log(messageEvent.data);
     const { type, data } = JSON.parse(messageEvent.data);
     ipcRenderer.send('robot', type, data);
   });
