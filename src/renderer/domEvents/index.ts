@@ -1,4 +1,5 @@
 import { throttle } from '../utils';
+import logger from '../../shared/logger';
 
 const privateState: Record<string, any> = {};
 function setState(newState: Record<string, any>) {
@@ -8,7 +9,7 @@ function getState() {
   return privateState;
 }
 
-enum MouseEventType {
+export enum MouseEventType {
   CLICK,
   DBLCLICK,
   MOUSEDOWN,
@@ -32,6 +33,8 @@ const handleMouseEvent = throttle((event: MouseEvent, type: MouseEventType) => {
     offsetX: Math.floor((offsetX * v.videoWidth) / v.clientWidth),
     offsetY: Math.floor((offsetY * v.videoHeight) / v.clientHeight),
   };
+
+  logger.debug('mouse event, ', JSON.stringify({ type, data }));
 
   window.electron.ipcRenderer.mouseEvent({
     type,
