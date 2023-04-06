@@ -24,8 +24,6 @@ const handleMouseEvent = throttle((event: MouseEvent, type: MouseEventType) => {
   event.preventDefault();
   event.stopPropagation();
 
-  console.log(type, event.offsetX, event.offsetY);
-
   const v = document.getElementById('video') as HTMLVideoElement;
 
   const { offsetX, offsetY } = event;
@@ -106,7 +104,13 @@ const handleMouseUp = (event: MouseEvent) => {
   }
 
   handleMouseEvent(event, MouseEventType.DRAGEND);
-  setState({ isDragging: false });
+  setState({
+    isDragging: false,
+    mouseDownX: undefined,
+    mouseDownY: undefined,
+    mouseUpX: undefined,
+    mouseUpY: undefined,
+  });
 };
 
 const handleMouseMove = (event: MouseEvent) => {

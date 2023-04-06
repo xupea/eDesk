@@ -2,7 +2,6 @@
 
 import path from 'path';
 import { app, BrowserWindow } from 'electron';
-import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
 let controlWindow: BrowserWindow | null = null;
@@ -44,9 +43,6 @@ const createControlWindow = async () => {
   controlWindow.on('closed', () => {
     controlWindow = null;
   });
-
-  const menuBuilder = new MenuBuilder(controlWindow);
-  menuBuilder.buildMenu();
 };
 
 const sendControlWindow = async (channel: string, ...args: any[]) => {

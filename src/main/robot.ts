@@ -15,6 +15,14 @@ enum MouseEventType {
 function moveMouse(data) {
   const { x, y, type } = data;
 
+  if (type === MouseEventType.CLICK) {
+    robot.mouseClick('left');
+  }
+
+  if (type === MouseEventType.DBLCLICK) {
+    robot.mouseClick('left', true);
+  }
+
   if (type === MouseEventType.MOUSEMOVE) {
     robot.moveMouse(x, y);
   }

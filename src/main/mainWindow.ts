@@ -1,10 +1,9 @@
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 
 import path from 'path';
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, shell, Menu } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
 class AppUpdater {
@@ -66,6 +65,7 @@ const createMainWindow = async () => {
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
     maximizable: false,
+    resizable: false,
   });
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
@@ -85,8 +85,7 @@ const createMainWindow = async () => {
     mainWindow = null;
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
+  Menu.setApplicationMenu(null);
 
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
