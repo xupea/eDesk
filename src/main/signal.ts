@@ -60,6 +60,7 @@ socket.on('message', (message) => {
   } catch (error) {
     console.log(error);
   }
+  console.log('signal message', data.event, data.data);
   signal.emit(data.event, data.data);
 });
 

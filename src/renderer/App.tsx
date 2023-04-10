@@ -30,19 +30,12 @@ const record = {
 function Home() {
   const [remoteCode, setRemoteCode] = useState('');
   const [localCode, setLocalCode] = useState('');
-  const [controlText, setControlText] = useState('');
-
   const [status, setStatus] = useState(Status.LOGGING);
 
   const login = async () => {
     setStatus(Status.LOGGING);
-    const localUuid = localStorage.getItem('uuid');
-    const { code, uuid } = await window.electron.ipcRenderer.invoke(
-      'login',
-      localUuid
-    );
-    localStorage.setItem('uuid', uuid);
-    setLocalCode(code);
+    const { code } = await window.electron.ipcRenderer.invoke('login');
+    setLocalCode(`${code}`.padStart(9, '0'));
     setStatus(Status.LOGGED);
   };
 
@@ -59,8 +52,8 @@ function Home() {
     setStatus(Status.CONTROLLING);
 
     window.electron.ipcRenderer.send('control', {
-      from: localCode,
-      to: code,
+      from: parseInt(localCode, 10),
+      to: parseInt(code, 10),
     });
   };
 
@@ -84,8 +77,6 @@ function Home() {
         maskClosable: true,
       });
     }
-
-    // setControlText(text);
   };
 
   useEffect(() => {
@@ -105,7 +96,6 @@ function Home() {
     <div className="mainContainer">
       {record[status]() || (
         <div>
-          <div>{controlText}</div>
           <div>本设备识别码</div>
           <div className="code">{localCode}</div>
           <div className="connect">

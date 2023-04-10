@@ -13,6 +13,20 @@ function Controller() {
 
   const ref = useRef<HTMLVideoElement>(null);
 
+  const handleControl = () => {
+    setStatus(Status.CONNECTED);
+  };
+
+  useEffect(() => {
+    window.electron.startControlling();
+
+    window.electron.emitterOn('control-ready', handleControl);
+
+    return () => {
+      window.electron.emmiterOff('control-ready', handleControl);
+    };
+  }, []);
+
   useEffect(() => {
     if (status === Status.CONNECTED) {
       bindDOMEvents(ref.current!);

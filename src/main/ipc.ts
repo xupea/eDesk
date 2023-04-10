@@ -1,5 +1,6 @@
 import { ipcMain, desktopCapturer } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
+import Store from 'electron-store';
 import { createControlWindow, sendControlWindow } from './controlWindow';
 import { sendMainWindow } from './mainWindow';
 import signal from './signal';
@@ -7,12 +8,13 @@ import { moveMouse, typeString } from './robot';
 
 export default async function ipc() {
   ipcMain.on('control', async (event, data) => {
+    const { to } = data;
     const { status } = await signal.invoke('control', data, 'control');
 
     if (status !== 'online') {
       sendMainWindow('control-state-change', null, 4);
     } else {
-      sendMainWindow('control-state-change', data.remote, 1);
+      sendMainWindow('control-state-change', to, 1);
       createControlWindow();
     }
   });
@@ -37,9 +39,11 @@ export default async function ipc() {
     sendMainWindow('candidate', data);
   });
 
-  ipcMain.handle('login', async (e, data) => {
-    const uuid = uuidv4();
-    await signal.connect(data || uuid);
+  ipcMain.handle('login', async () => {
+    const store = new Store();
+    const uuid = store.get('uuid') || uuidv4();
+    store.set('uuid', uuid);
+    await signal.connect(uuid);
     const { code } = await signal.invoke('login', null, 'logined');
     return { code, uuid };
   });

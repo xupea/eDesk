@@ -1,6 +1,9 @@
 // Disable no-unused-vars, broken for spread args
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { EventEmitter } from 'events';
+
+const emmiter = new EventEmitter();
 
 const rtcPeerConnection = new RTCPeerConnection({
   iceServers: [
@@ -47,9 +50,6 @@ async function createOffer() {
     sdp: localDescription?.sdp,
   });
 }
-
-// step1
-createOffer();
 
 // step2
 // 傀儡端发送过来的
@@ -130,6 +130,8 @@ rtcPeerConnection.addEventListener('icecandidateerror', (e) => {
 
 // step4
 rtcPeerConnection.addEventListener('track', (e) => {
+  emmiter.emit('control-ready');
+  console.log('track', e.streams);
   const videoElement = document.getElementById('video') as HTMLVideoElement;
   [videoElement.srcObject] = e.streams;
   videoElement.addEventListener('loadedmetadata', () => {
@@ -188,6 +190,16 @@ const electronHandler = {
         );
       }
     },
+  },
+  startControlling() {
+    // step1
+    createOffer();
+  },
+  emitterOn(event: string, listener: (...args: any[]) => void) {
+    emmiter.on(event, listener);
+  },
+  emitterOff(event: string, listener: (...args: any[]) => void) {
+    emmiter.off(event, listener);
   },
 };
 
