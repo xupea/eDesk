@@ -3,6 +3,7 @@
 import path from 'path';
 import { app, BrowserWindow } from 'electron';
 import { resolveHtmlPath } from './util';
+import { sendMainWindow } from './mainWindow';
 
 let controlWindow: BrowserWindow | null = null;
 
@@ -17,8 +18,8 @@ const createControlWindow = async () => {
 
   controlWindow = new BrowserWindow({
     show: false,
-    width: 1280,
-    height: 690,
+    width: 800,
+    height: 500,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -38,6 +39,10 @@ const createControlWindow = async () => {
     } else {
       controlWindow.show();
     }
+  });
+
+  controlWindow.on('close', () => {
+    sendMainWindow('control-state-change', null, 3);
   });
 
   controlWindow.on('closed', () => {

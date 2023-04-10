@@ -160,25 +160,6 @@ window.addEventListener('keyup', (event) => {
   }
 });
 
-// window.addEventListener('mouseup', (event) => {
-//   const { pageX, pageY, button } = event;
-//   console.log(pageX, pageY, button);
-//   const data = { pageX, pageY, button };
-
-//   const { videoWidth, videoHeight } = document.getElementById(
-//     'video'
-//   ) as HTMLVideoElement;
-
-//   if (dataChannel.readyState === 'open') {
-//     dataChannel.send(
-//       JSON.stringify({
-//         type: 'mouse',
-//         data,
-//       })
-//     );
-//   }
-// });
-
 const electronHandler = {
   ipcRenderer: {
     invoke(channel: string, ...args: any[]) {

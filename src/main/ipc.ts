@@ -1,19 +1,20 @@
 import { ipcMain, desktopCapturer } from 'electron';
+import { v4 as uuidv4 } from 'uuid';
 import { createControlWindow, sendControlWindow } from './controlWindow';
 import { sendMainWindow } from './mainWindow';
 import signal from './signal';
 import { moveMouse, typeString } from './robot';
 
 export default async function ipc() {
-  ipcMain.on('control', async (event, remote: string) => {
-    sendMainWindow('control-state-change', 'data.remote', 1);
-    createControlWindow();
-    // signal.send('control', { remote });
-  });
+  ipcMain.on('control', async (event, data) => {
+    const { status } = await signal.invoke('control', data, 'control');
 
-  signal.on('controlled', (data) => {
-    sendMainWindow('control-state-change', data.remote, 1);
-    createControlWindow();
+    if (status !== 'online') {
+      sendMainWindow('control-state-change', null, 4);
+    } else {
+      sendMainWindow('control-state-change', data.remote, 1);
+      createControlWindow();
+    }
   });
 
   signal.on('be-controlled', (data) => {
@@ -37,9 +38,10 @@ export default async function ipc() {
   });
 
   ipcMain.handle('login', async (e, data) => {
-    await signal.connect(data);
+    const uuid = uuidv4();
+    await signal.connect(data || uuid);
     const { code } = await signal.invoke('login', null, 'logined');
-    return code;
+    return { code, uuid };
   });
 
   ipcMain.handle('source', async () => {
