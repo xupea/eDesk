@@ -20,11 +20,12 @@ function Controller() {
   useEffect(() => {
     window.electron.startControlling();
 
-    window.electron.emitterOn('control-ready', handleControl);
+    // window.electron.emitterOn('control-ready', handleControl);
 
-    return () => {
-      window.electron.emmiterOff('control-ready', handleControl);
-    };
+    // return () => {
+    //   window.electron.emmiterOff('control-ready', handleControl);
+    // };
+    setStatus(Status.CONNECTED);
   }, []);
 
   useEffect(() => {

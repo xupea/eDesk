@@ -22,32 +22,18 @@ const electronHandler = {
   },
 };
 
+const DEFAULT_DISPLAY_CONFIGURATION = {
+  bitrate: 2e3,
+  frameRate: 10,
+  height: 1080,
+  width: 1920,
+};
+
 async function getScreenStream() {
   const deviceId = await ipcRenderer.invoke('source');
-  // this is only supported in v22
-  // return navigator.mediaDevices.getDisplayMedia({
-  //   audio: false,
-  //   video: {
-  //     deviceId,
-  //     width: {
-  //       max: window.screen.width,
-  //     },
-  //     height: {
-  //       max: window.screen.height,
-  //     },
-  //   },
-  // });
+
   return navigator.mediaDevices.getUserMedia({
     audio: false,
-    // video: {
-    //   deviceId,
-    //   width: {
-    //     max: window.screen.width,
-    //   },
-    //   height: {
-    //     max: window.screen.height,
-    //   },
-    // },
     video: {
       mandatory: {
         chromeMediaSource: 'desktop',
@@ -77,6 +63,18 @@ rtcPeerConnection.addEventListener('datachannel', (event) => {
     const { type, data } = JSON.parse(messageEvent.data);
     ipcRenderer.send('robot', type, data);
   });
+});
+
+rtcPeerConnection.addEventListener('iceconnectionstatechange', (e) => {
+  console.log('ICE state changed: ', rtcPeerConnection.iceConnectionState);
+});
+
+rtcPeerConnection.addEventListener('icegatheringstatechange', (e) => {
+  const connection = e.target;
+  console.log(
+    'ICE gathering state changed: ',
+    rtcPeerConnection.iceGatheringState
+  );
 });
 
 // step2

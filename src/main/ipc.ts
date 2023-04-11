@@ -7,20 +7,51 @@ import signal from './signal';
 import { moveMouse, typeString } from './robot';
 
 export default async function ipc() {
-  ipcMain.on('control', async (event, data) => {
-    const { to } = data;
-    const { status } = await signal.invoke('control', data, 'control');
+  // 转发
+  ipcMain.on('forward', (e, event, data) => {
+    signal.send('forward', { event, data });
+  });
 
-    if (status !== 'online') {
-      sendMainWindow('control-state-change', null, 4);
-    } else {
-      sendMainWindow('control-state-change', to, 1);
-      createControlWindow();
+  // 鼠标和键盘控制
+  ipcMain.on('robot', (e, event, data) => {
+    if (event === 'key') {
+      typeString(data);
+    }
+
+    if (event === 'mouse') {
+      moveMouse(data);
     }
   });
 
-  signal.on('be-controlled', (data) => {
-    sendMainWindow('control-state-change', data.remote, 2);
+  // 傀儡端逻辑
+  signal.on('asking-control', (data) => {
+    console.log('asking-control', data);
+    // 提示用户是否接受控制
+    sendMainWindow('control-state-change', null, 5);
+  });
+
+  // 傀儡端逻辑
+  ipcMain.on('control-allow', async (event, data) => {
+    signal.send('control-allow', data);
+    sendMainWindow('control-state-change', null, 2);
+  });
+
+  // 主控端逻辑
+  ipcMain.on('control', async (event, data) => {
+    const { status } = await signal.invoke('control', data, 'control');
+
+    // 当傀儡端不可用
+    if (status !== 'online') {
+      sendMainWindow('control-state-change', null, 4);
+    }
+  });
+
+  // 主控端逻辑
+  signal.on('control-ready', (data) => {
+    // 通知主窗口，控制端已经准备好
+    sendMainWindow('control-state-change', data, 1);
+    // 创建控制窗口
+    createControlWindow();
   });
 
   signal.on('offer', (data) => {
@@ -51,20 +82,5 @@ export default async function ipc() {
   ipcMain.handle('source', async () => {
     const sources = await desktopCapturer.getSources({ types: ['screen'] });
     return sources[0].id;
-  });
-
-  // 转发
-  ipcMain.on('forward', (e, event, data) => {
-    signal.send('forward', { event, data });
-  });
-
-  ipcMain.on('robot', (e, event, data) => {
-    if (event === 'key') {
-      typeString(data);
-    }
-
-    if (event === 'mouse') {
-      moveMouse(data);
-    }
   });
 }

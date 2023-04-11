@@ -125,18 +125,35 @@ rtcPeerConnection.addEventListener('icecandidate', (e) => {
 });
 
 rtcPeerConnection.addEventListener('icecandidateerror', (e) => {
-  console.log('ICE state error event: ', e);
+  console.log('ICE state error event from controller: ', e);
+});
+
+rtcPeerConnection.addEventListener('iceconnectionstatechange', (e) => {
+  console.log(
+    'ICE state changed from controller: ',
+    rtcPeerConnection.iceConnectionState
+  );
+});
+
+rtcPeerConnection.addEventListener('icegatheringstatechange', (e) => {
+  const connection = e.target;
+  console.log(
+    'ICE gathering state changed from controller: ',
+    rtcPeerConnection.iceGatheringState
+  );
 });
 
 // step4
 rtcPeerConnection.addEventListener('track', (e) => {
-  emmiter.emit('control-ready');
-  console.log('track', e.streams);
+  // emmiter.emit('control-ready');
+
+  // setTimeout(() => {
   const videoElement = document.getElementById('video') as HTMLVideoElement;
   [videoElement.srcObject] = e.streams;
   videoElement.addEventListener('loadedmetadata', () => {
     videoElement.play();
   });
+  // }, 1000);
 });
 
 window.addEventListener('keydown', (event) => {

@@ -10,6 +10,7 @@ enum Status {
   LOGGED = 'logged',
   BEING_CONTROLLED = 'being-controlled',
   CONTROLLING = 'controlling',
+  ASK_CONTROL = 'ask-control',
 }
 
 const record = {
@@ -24,6 +25,9 @@ const record = {
   },
   [Status.CONTROLLING]: function controlling() {
     return <div>Controlling</div>;
+  },
+  [Status.ASK_CONTROL]: function controlling() {
+    return <div>Somebody ask to control your desktop</div>;
   },
 };
 
@@ -75,6 +79,20 @@ function Home() {
         title: '识别码',
         content: '识别码不存在或不在线',
         maskClosable: true,
+      });
+    } else if (type === 5) {
+      // 请求控制
+      Modal.confirm({
+        title: 'Warning',
+        content: 'Somebody ask to control your desktop',
+        okText: 'Yes',
+        cancelText: 'No',
+        onOk: () => {
+          window.electron.ipcRenderer.send('control-allow', {
+            from: parseInt(localCode, 10),
+            to: parseInt(remoteCode, 10),
+          });
+        },
       });
     }
   };
