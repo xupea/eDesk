@@ -34,7 +34,7 @@ const handleMouseEvent = throttle((event: MouseEvent, type: MouseEventType) => {
     offsetY: Math.floor((offsetY * v.videoHeight) / v.clientHeight),
   };
 
-  logger.debug('mouse event, ', JSON.stringify({ type, data }));
+  // logger.debug('mouse event, ', JSON.stringify({ type, data }));
 
   window.electron.ipcRenderer.mouseEvent({
     type,

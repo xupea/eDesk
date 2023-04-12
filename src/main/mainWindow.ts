@@ -104,4 +104,8 @@ const sendMainWindow = async (channel: string, ...args: any[]) => {
   mainWindow?.webContents.send(channel, ...args);
 };
 
-export { createMainWindow, sendMainWindow };
+const showMainWindow = () => {
+  mainWindow?.show();
+};
+
+export { createMainWindow, sendMainWindow, showMainWindow };

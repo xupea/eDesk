@@ -197,7 +197,6 @@ const electronHandler = {
       ipcRenderer.removeListener(channel, listener);
     },
     mouseEvent(data) {
-      console.log(data);
       if (dataChannel.readyState === 'open') {
         dataChannel.send(
           JSON.stringify({

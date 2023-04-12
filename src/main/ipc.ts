@@ -2,7 +2,7 @@ import { ipcMain, desktopCapturer } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
 import Store from 'electron-store';
 import { createControlWindow, sendControlWindow } from './controlWindow';
-import { sendMainWindow } from './mainWindow';
+import { sendMainWindow, showMainWindow } from './mainWindow';
 import signal from './signal';
 import { moveMouse, typeString } from './robot';
 
@@ -33,6 +33,7 @@ export default async function ipc() {
   // 傀儡端逻辑
   ipcMain.on('control-allow', async (event, data) => {
     signal.send('control-allow', data);
+    showMainWindow();
     sendMainWindow('control-state-change', null, 2);
   });
 
