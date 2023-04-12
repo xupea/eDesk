@@ -27,13 +27,13 @@ export default async function ipc() {
   signal.on('asking-control', (data) => {
     console.log('asking-control', data);
     // 提示用户是否接受控制
+    showMainWindow();
     sendMainWindow('control-state-change', null, 5);
   });
 
   // 傀儡端逻辑
   ipcMain.on('control-allow', async (event, data) => {
     signal.send('control-allow', data);
-    showMainWindow();
     sendMainWindow('control-state-change', null, 2);
   });
 
@@ -53,6 +53,15 @@ export default async function ipc() {
     sendMainWindow('control-state-change', data, 1);
     // 创建控制窗口
     createControlWindow();
+  });
+
+  // 主控端逻辑
+  ipcMain.on('control-end', async (event, data) => {
+    await signal.invoke('control-end', data, 'control-end');
+  });
+
+  signal.on('control-end', (data) => {
+    sendMainWindow('control-state-change', data, 3);
   });
 
   signal.on('offer', (data) => {

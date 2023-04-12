@@ -72,6 +72,7 @@ function Home() {
     } else if (type === 3) {
       // text = `连接已断开`;
       setStatus(Status.LOGGED);
+      window.electron.ipcRenderer.send('control-end');
     } else if (type === 4) {
       // 不在线不可用
       setStatus(Status.LOGGED);
