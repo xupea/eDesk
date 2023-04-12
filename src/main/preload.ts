@@ -1,33 +1,13 @@
 // Disable no-unused-vars, broken for spread args
-/* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import InviteeConnection from './connection/inviteeConnection';
 
-const electronHandler = {
-  ipcRenderer: {
-    invoke(channel: string, ...args: any[]) {
-      return ipcRenderer.invoke(channel, ...args);
-    },
-    send(channel: string, ...args: any[]) {
-      ipcRenderer.send(channel, ...args);
-    },
-    on(
-      channel: string,
-      listener: (event: IpcRendererEvent, ...args: any[]) => void
-    ) {
-      ipcRenderer.on(channel, listener);
-    },
-    removeListener(channel: string, listener: (...args: any[]) => void) {
-      ipcRenderer.removeListener(channel, listener);
-    },
-  },
-};
+const connection = new InviteeConnection();
 
-const DEFAULT_DISPLAY_CONFIGURATION = {
-  bitrate: 2e3,
-  frameRate: 10,
-  height: 1080,
-  width: 1920,
-};
+connection.addEventListener('datachannelMessage', (event) => {
+  const { type, data } = JSON.parse(event.data);
+  ipcRenderer.send('robot', type, data);
+});
 
 async function getScreenStream() {
   const deviceId = await ipcRenderer.invoke('source');
@@ -45,131 +25,50 @@ async function getScreenStream() {
   });
 }
 
-const rtcPeerConnection = new RTCPeerConnection({
-  iceServers: [
-    {
-      urls: 'stun:39.108.191.135:3478',
-    },
-    {
-      urls: 'turn:39.108.191.135:3478',
-      username: 'ninefingers',
-      credential: 'youhavetoberealistic',
-    },
-  ],
-});
-
-rtcPeerConnection.addEventListener('datachannel', (event) => {
-  event.channel.addEventListener('message', (messageEvent) => {
-    const { type, data } = JSON.parse(messageEvent.data);
-    ipcRenderer.send('robot', type, data);
-  });
-});
-
-rtcPeerConnection.addEventListener('iceconnectionstatechange', (e) => {
-  console.log('ICE state changed: ', rtcPeerConnection.iceConnectionState);
-});
-
-rtcPeerConnection.addEventListener('icegatheringstatechange', (e) => {
-  const connection = e.target;
-  console.log(
-    'ICE gathering state changed: ',
-    rtcPeerConnection.iceGatheringState
-  );
-});
-
-// step2
-async function createAnswer(offer: RTCSessionDescriptionInit) {
-  // step3
-  rtcPeerConnection.addEventListener('icecandidate', (e) => {
-    if (!e.candidate) {
-      return;
-    }
-
-    const {
-      address,
-      candidate,
-      component,
-      foundation,
-      port,
-      priority,
-      protocol,
-      relatedAddress,
-      relatedPort,
-      sdpMLineIndex,
-      sdpMid,
-      tcpType,
-      type,
-      usernameFragment,
-    } = e.candidate;
-
-    ipcRenderer.send('forward', 'puppet-candidate', {
-      address,
-      candidate,
-      component,
-      foundation,
-      port,
-      priority,
-      protocol,
-      relatedAddress,
-      relatedPort,
-      sdpMLineIndex,
-      sdpMid,
-      tcpType,
-      type,
-      usernameFragment,
-    });
-  });
-
+// step 1
+ipcRenderer.on('offer', async (e, offer) => {
   const gumSteam = await getScreenStream();
-  // eslint-disable-next-line no-restricted-syntax
-  for (const track of gumSteam.getTracks()) {
-    rtcPeerConnection.addTrack(track, gumSteam);
-  }
-
-  await rtcPeerConnection.setRemoteDescription(offer);
-
-  await rtcPeerConnection.setLocalDescription(
-    await rtcPeerConnection.createAnswer()
-  );
-
-  const { localDescription } = rtcPeerConnection;
-
-  ipcRenderer.send('forward', 'answer', {
-    type: localDescription?.type,
-    sdp: localDescription?.sdp,
-  });
-}
-
-let candidates = [];
-
-async function addCandidate(candidate) {
-  if (!candidate || !candidate.type) {
-    return;
-  }
-
-  candidates.push(candidate);
-
-  if (
-    rtcPeerConnection.remoteDescription &&
-    rtcPeerConnection.remoteDescription.type
-  ) {
-    for (let i = 0; i < candidates.length; i++) {
-      await rtcPeerConnection.addIceCandidate(
-        new RTCIceCandidate(candidates[i])
-      );
-    }
-    candidates = [];
-  }
-}
-
-ipcRenderer.on('candidate', (e, candidate) => {
-  addCandidate(candidate);
+  await connection.reply(offer, gumSteam);
 });
 
-// step1
-ipcRenderer.on('offer', (e, offer) => {
-  createAnswer(offer);
+// step 2
+connection.addEventListener('createAnswer', (localDescription) => {
+  ipcRenderer.send('forward', 'answer', localDescription);
 });
+
+// step 3
+ipcRenderer.on('candidate', (e, candidates) => {
+  console.log(candidates);
+  connection.addIceCandidates(candidates);
+});
+
+// step 4
+connection.addEventListener('icecandidates', (candidates) => {
+  console.log(candidates);
+  ipcRenderer.send('forward', 'puppet-candidate', candidates);
+});
+
+const electronHandler = {
+  ipcRenderer: {
+    invoke(channel: string, ...args: any[]) {
+      return ipcRenderer.invoke(channel, ...args);
+    },
+    send(channel: string, ...args: any[]) {
+      ipcRenderer.send(channel, ...args);
+    },
+    on(
+      channel: string,
+      // eslint-disable-next-line no-unused-vars
+      listener: (event: IpcRendererEvent, ...args: any[]) => void
+    ) {
+      ipcRenderer.on(channel, listener);
+    },
+    // eslint-disable-next-line no-unused-vars
+    removeListener(channel: string, listener: (...args: any[]) => void) {
+      ipcRenderer.removeListener(channel, listener);
+    },
+  },
+};
 
 contextBridge.exposeInMainWorld('electron', electronHandler);
 

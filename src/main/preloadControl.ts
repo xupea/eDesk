@@ -2,181 +2,32 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { EventEmitter } from 'events';
+import InviterConnection from './connection/inviterConnection';
+
+const connection = new InviterConnection();
+
+connection.addEventListener('createOffer', (localDescription) => {
+  ipcRenderer.send('forward', 'offer', localDescription);
+});
+
+connection.addEventListener('icecandidates', (candidates) => {
+  console.log(candidates);
+  ipcRenderer.send('forward', 'control-candidate', candidates);
+});
 
 const emmiter = new EventEmitter();
 
-const rtcPeerConnection = new RTCPeerConnection({
-  iceServers: [
-    {
-      urls: 'stun:39.108.191.135:3478',
-    },
-    {
-      urls: 'turn:39.108.191.135:3478',
-      username: 'ninefingers',
-      credential: 'youhavetoberealistic',
-    },
-  ],
-});
-
-const dataChannel = rtcPeerConnection.createDataChannel('robotchannel', {
-  ordered: false,
-});
-
-dataChannel.addEventListener('open', () => {
-  console.log('control datachannel is oepn');
-});
-
-dataChannel.addEventListener('message', (event) => {
-  console.log(event.data);
-});
-
-dataChannel.addEventListener('error', (error) => {
-  console.log('dataChannel error', error);
-});
-
-// 控制端创建 offer 给信令服务
-async function createOffer() {
-  const offer = await rtcPeerConnection.createOffer({
-    offerToReceiveAudio: false,
-    offerToReceiveVideo: true,
-  });
-
-  await rtcPeerConnection.setLocalDescription(offer);
-
-  const { localDescription } = rtcPeerConnection;
-
-  ipcRenderer.send('forward', 'offer', {
-    type: localDescription?.type,
-    sdp: localDescription?.sdp,
-  });
-}
-
-// step2
-// 傀儡端发送过来的
-ipcRenderer.on('answer', async (e, offer) => {
-  await rtcPeerConnection.setRemoteDescription(offer);
-});
-
-let candidates = [];
-
-async function addCandidate(candidate) {
-  if (!candidate || !candidate.type) {
-    return;
-  }
-
-  candidates.push(candidate);
-
-  if (
-    rtcPeerConnection.remoteDescription &&
-    rtcPeerConnection.remoteDescription.type
-  ) {
-    for (let i = 0; i < candidates.length; i++) {
-      await rtcPeerConnection.addIceCandidate(
-        new RTCIceCandidate(candidates[i])
-      );
-    }
-    candidates = [];
-  }
-}
-
-ipcRenderer.on('candidate', (e, candidate) => {
-  addCandidate(candidate);
-});
-
-// step3
-rtcPeerConnection.addEventListener('icecandidate', (e) => {
-  if (!e.candidate) {
-    return;
-  }
-
-  const {
-    address,
-    candidate,
-    component,
-    foundation,
-    port,
-    priority,
-    protocol,
-    relatedAddress,
-    relatedPort,
-    sdpMLineIndex,
-    sdpMid,
-    tcpType,
-    type,
-    usernameFragment,
-  } = e.candidate;
-
-  ipcRenderer.send('forward', 'control-candidate', {
-    address,
-    candidate,
-    component,
-    foundation,
-    port,
-    priority,
-    protocol,
-    relatedAddress,
-    relatedPort,
-    sdpMLineIndex,
-    sdpMid,
-    tcpType,
-    type,
-    usernameFragment,
-  });
-});
-
-rtcPeerConnection.addEventListener('icecandidateerror', (e) => {
-  console.log('ICE state error event from controller: ', e);
-});
-
-rtcPeerConnection.addEventListener('iceconnectionstatechange', (e) => {
-  console.log(
-    'ICE state changed from controller: ',
-    rtcPeerConnection.iceConnectionState
-  );
-});
-
-rtcPeerConnection.addEventListener('icegatheringstatechange', (e) => {
-  const connection = e.target;
-  console.log(
-    'ICE gathering state changed from controller: ',
-    rtcPeerConnection.iceGatheringState
-  );
-});
-
-// step4
-rtcPeerConnection.addEventListener('track', (e) => {
-  // emmiter.emit('control-ready');
-
-  // setTimeout(() => {
+connection.addEventListener('onTrack', (event) => {
+  emmiter.emit('control-ready');
   const videoElement = document.getElementById('video') as HTMLVideoElement;
-  [videoElement.srcObject] = e.streams;
+  [videoElement.srcObject] = event.streams;
   videoElement.addEventListener('loadedmetadata', () => {
     videoElement.play();
   });
-  // }, 1000);
 });
 
-window.addEventListener('keydown', (event) => {
-  event.preventDefault();
-  event.stopPropagation();
-});
-
-window.addEventListener('keyup', (event) => {
-  event.preventDefault();
-  event.stopPropagation();
-
-  const { key, shiftKey, code, metaKey, altKey, ctrlKey } = event;
-  console.log(key, shiftKey, code, metaKey, altKey, ctrlKey);
-  const data = { key, shiftKey, code, metaKey, altKey, ctrlKey };
-
-  if (dataChannel.readyState === 'open') {
-    dataChannel.send(
-      JSON.stringify({
-        type: 'key',
-        data,
-      })
-    );
-  }
+ipcRenderer.on('answer', (e, description) => {
+  connection.setRemoteDescription(description);
 });
 
 const electronHandler = {
@@ -196,26 +47,24 @@ const electronHandler = {
     removeListener(channel: string, listener: (...args: any[]) => void) {
       ipcRenderer.removeListener(channel, listener);
     },
-    mouseEvent(data) {
-      if (dataChannel.readyState === 'open') {
-        dataChannel.send(
-          JSON.stringify({
-            type: 'mouse',
-            data,
-          })
-        );
-      }
-    },
   },
   startControlling() {
     // step1
-    createOffer();
+    connection.initiate();
   },
   emitterOn(event: string, listener: (...args: any[]) => void) {
     emmiter.on(event, listener);
   },
   emitterOff(event: string, listener: (...args: any[]) => void) {
     emmiter.off(event, listener);
+  },
+  mouseEvent(data: any) {
+    connection.sendData(
+      JSON.stringify({
+        type: 'mouse',
+        data,
+      })
+    );
   },
 };
 

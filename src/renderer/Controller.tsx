@@ -20,12 +20,11 @@ function Controller() {
   useEffect(() => {
     window.electron.startControlling();
 
-    // window.electron.emitterOn('control-ready', handleControl);
+    window.electron.emitterOn('control-ready', handleControl);
 
-    // return () => {
-    //   window.electron.emmiterOff('control-ready', handleControl);
-    // };
-    setStatus(Status.CONNECTED);
+    return () => {
+      window.electron.emmiterOff('control-ready', handleControl);
+    };
   }, []);
 
   useEffect(() => {
@@ -34,14 +33,15 @@ function Controller() {
     }
   }, [status]);
 
-  return status === Status.CONNECTING ? (
+  return (
     <div className="mainContainer">
-      <Spin size="large">
-        <div className="content" />
-      </Spin>
+      {status === Status.CONNECTING && (
+        <Spin size="large">
+          <div className="content" />
+        </Spin>
+      )}
+      <video id="video" ref={ref} />
     </div>
-  ) : (
-    <video id="video" ref={ref} />
   );
 }
 

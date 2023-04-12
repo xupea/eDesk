@@ -1,5 +1,5 @@
 import { throttle } from '../utils';
-import logger from '../../shared/logger';
+// import logger from '../../shared/logger';
 
 const privateState: Record<string, any> = {};
 function setState(newState: Record<string, any>) {
@@ -36,7 +36,7 @@ const handleMouseEvent = throttle((event: MouseEvent, type: MouseEventType) => {
 
   // logger.debug('mouse event, ', JSON.stringify({ type, data }));
 
-  window.electron.ipcRenderer.mouseEvent({
+  window.electron.mouseEvent({
     type,
     x: data.offsetX,
     y: data.offsetY,
