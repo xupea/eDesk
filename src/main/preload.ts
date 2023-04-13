@@ -70,7 +70,7 @@ ipcRenderer.on('candidate', (e, candidates) => {
 
 // step 4
 connection.addEventListener('icecandidates', (candidates) => {
-  console.log(candidates);
+  console.log('invitee client candidate: ', candidates);
   ipcRenderer.send('forward', 'puppet-candidate', candidates);
 });
 

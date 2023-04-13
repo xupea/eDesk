@@ -11,7 +11,7 @@ connection.addEventListener('createOffer', (localDescription) => {
 });
 
 connection.addEventListener('icecandidates', (candidates) => {
-  console.log(candidates);
+  console.log('invitor candidates: ', candidates);
   ipcRenderer.send('forward', 'control-candidate', candidates);
 });
 

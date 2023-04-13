@@ -104,8 +104,7 @@ export class Connection {
       this.queueCandidate(candidate);
     } else {
       this.queueCandidate(null);
-
-      this.sendCandidateQueue();
+      // this.sendCandidateQueue();
     }
   };
 
@@ -120,11 +119,11 @@ export class Connection {
       this.candidateEnded = true;
     }
 
-    // const delay = this.direction === Direction.Inbound ? 500 : 2000;
+    const delay = this.direction === Direction.Inbound ? 500 : 2000;
 
-    // setTimeout(() => {
-    //   this.sendCandidateQueue();
-    // }, delay);
+    setTimeout(() => {
+      this.sendCandidateQueue();
+    }, delay);
   }
 
   async sendCandidateQueue() {
@@ -144,6 +143,8 @@ export class Connection {
     // }
 
     this.emitter.emit('icecandidates', content);
+
+    this.sendCandidateQueue();
   }
 
   async addIceCandidates(candidates: RTCIceCandidate[]) {
