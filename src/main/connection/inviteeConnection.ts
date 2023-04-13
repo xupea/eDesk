@@ -14,7 +14,6 @@ class InviteeConnection extends Connection {
         event.channel.addEventListener(
           'message',
           (messageEvent: MessageEvent) => {
-            console.log(messageEvent);
             this.emitter.emit('datachannelMessage', messageEvent);
           }
         );

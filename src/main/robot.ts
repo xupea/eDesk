@@ -1,6 +1,6 @@
 import robot from 'robotjs';
 
-enum MouseEventType {
+export enum MouseEventType {
   CLICK,
   DBLCLICK,
   MOUSEDOWN,
@@ -12,8 +12,16 @@ enum MouseEventType {
   DRAGEND,
 }
 
-function moveMouse(data) {
-  const { x, y, type } = data;
+interface MouseEventData {
+  x: number;
+  y: number;
+  type: MouseEventType;
+  devicePixelRatio: number;
+}
+
+function moveMouse(data: MouseEventData) {
+  const { x, y, type, devicePixelRatio } = data;
+  const [newX, newY] = [x / devicePixelRatio, y / devicePixelRatio];
 
   if (type === MouseEventType.CLICK) {
     robot.mouseClick('left');
@@ -24,7 +32,7 @@ function moveMouse(data) {
   }
 
   if (type === MouseEventType.MOUSEMOVE) {
-    robot.moveMouse(x, y);
+    robot.moveMouse(newX, newY);
   }
 
   if (type === MouseEventType.DRAGBEGIN) {
@@ -32,14 +40,12 @@ function moveMouse(data) {
   }
 
   if (type === MouseEventType.DRAGMOVE) {
-    robot.dragMouse(x, y);
+    robot.dragMouse(newX, newY);
   }
 
   if (type === MouseEventType.DRAGEND) {
     robot.mouseToggle('up');
   }
-
-  console.log('moveMouse', data);
 }
 
 function typeString(data) {

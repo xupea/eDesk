@@ -4,11 +4,6 @@ import InviteeConnection from './connection/inviteeConnection';
 
 const connection = new InviteeConnection();
 
-connection.addEventListener('datachannelMessage', (event) => {
-  const { type, data } = JSON.parse(event.data);
-  ipcRenderer.send('robot', type, data);
-});
-
 function isRetinaDisplay() {
   if (window.matchMedia) {
     const mq = window.matchMedia(
@@ -19,10 +14,27 @@ function isRetinaDisplay() {
   return false;
 }
 
+connection.addEventListener('datachannelMessage', (event) => {
+  const { type, data } = JSON.parse(event.data);
+  ipcRenderer.send('robot', type, {
+    ...data,
+    devicePixelRatio: isRetinaDisplay() ? window.devicePixelRatio : 1,
+  });
+});
+
 async function getScreenStream() {
   const deviceId = await ipcRenderer.invoke('source');
   const displays = await ipcRenderer.invoke('getAllDisplays');
-  console.log(displays);
+  const [mainDisplay] = displays;
+  const {
+    scaleFactor,
+    size: { width, height },
+  } = mainDisplay;
+
+  const maxWidth = isRetinaDisplay() ? width * scaleFactor : width;
+  const maxHeight = isRetinaDisplay() ? height * scaleFactor : height;
+
+  console.log('invitee client: ', maxWidth, maxHeight, deviceId);
 
   return navigator.mediaDevices.getUserMedia({
     audio: false,
@@ -30,8 +42,10 @@ async function getScreenStream() {
       mandatory: {
         chromeMediaSource: 'desktop',
         chromeMediaSourceId: deviceId,
-        maxWidth: window.screen.width,
-        maxHeight: window.screen.height,
+        maxWidth,
+        maxHeight,
+        minWidth: maxWidth,
+        minHeight: maxHeight,
       },
     },
   });

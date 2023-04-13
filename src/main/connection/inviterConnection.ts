@@ -30,7 +30,6 @@ class InviterConnection extends Connection {
 
   public sendData(data: string) {
     if (this.dataChannel?.readyState === 'open') {
-      console.log(data);
       this.dataChannel.send(data);
     }
   }
