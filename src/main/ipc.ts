@@ -1,4 +1,4 @@
-import { ipcMain, desktopCapturer } from 'electron';
+import { ipcMain, desktopCapturer, screen } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
 import Store from 'electron-store';
 import { createControlWindow, sendControlWindow } from './controlWindow';
@@ -92,5 +92,10 @@ export default async function ipc() {
   ipcMain.handle('source', async () => {
     const sources = await desktopCapturer.getSources({ types: ['screen'] });
     return sources[0].id;
+  });
+
+  ipcMain.handle('getAllDisplays', async () => {
+    const results = await screen.getAllDisplays();
+    return results;
   });
 }

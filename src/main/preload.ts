@@ -9,8 +9,20 @@ connection.addEventListener('datachannelMessage', (event) => {
   ipcRenderer.send('robot', type, data);
 });
 
+function isRetinaDisplay() {
+  if (window.matchMedia) {
+    const mq = window.matchMedia(
+      '(-webkit-min-device-pixel-ratio: 1.5), (min--moz-device-pixel-ratio: 1.5), (-o-min-device-pixel-ratio: 3/2), (min-resolution: 1.5dppx)'
+    );
+    return (mq && mq.matches) || window.devicePixelRatio > 1;
+  }
+  return false;
+}
+
 async function getScreenStream() {
   const deviceId = await ipcRenderer.invoke('source');
+  const displays = await ipcRenderer.invoke('getAllDisplays');
+  console.log(displays);
 
   return navigator.mediaDevices.getUserMedia({
     audio: false,
