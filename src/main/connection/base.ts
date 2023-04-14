@@ -42,6 +42,10 @@ export class Connection {
     this.forceTURN = forceTURN ?? false;
   }
 
+  public close() {
+    this.rtcPeerConnection?.close();
+  }
+
   protected createPeerConnection() {
     const rtcPeerConnection = new RTCPeerConnection({
       iceServers: [

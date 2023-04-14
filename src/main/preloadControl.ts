@@ -30,6 +30,10 @@ ipcRenderer.on('answer', (e, description) => {
   connection.setRemoteDescription(description);
 });
 
+ipcRenderer.on('control-end', () => {
+  connection.close();
+});
+
 const electronHandler = {
   ipcRenderer: {
     invoke(channel: string, ...args: any[]) {

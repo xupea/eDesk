@@ -43,6 +43,8 @@ const createControlWindow = async () => {
   });
 
   controlWindow.on('close', () => {
+    controlWindow?.webContents.send('control-end');
+
     showMainWindow();
     sendMainWindow('control-state-change', null, MainStatus.CONTROL_END);
   });
