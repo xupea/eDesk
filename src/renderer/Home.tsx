@@ -1,6 +1,6 @@
 import { useEffect, useState, ReactElement } from 'react';
 import { Input, Button, Modal } from 'antd';
-
+import logger from 'shared/logger';
 import { MainStatus } from '../shared/types';
 
 const record: Record<MainStatus, () => ReactElement | null> = {
@@ -54,6 +54,7 @@ function Home() {
   const [status, setStatus] = useState(MainStatus.UNLOGGED);
 
   const login = async () => {
+    logger.debug('login code runs');
     setStatus(MainStatus.LOGGING_IN);
 
     // machine code number
@@ -62,6 +63,8 @@ function Home() {
     setLocalCode(`${code}`.padStart(9, '0'));
 
     setStatus(MainStatus.LOGGED_IN);
+
+    logger.debug('login code after');
   };
 
   const requestControl = (code: string) => {
@@ -115,6 +118,8 @@ function Home() {
   };
 
   useEffect(() => {
+    logger.debug('start login and get machine code');
+
     login();
 
     window.electron.ipcRenderer.on('control-state-change', handleControlState);

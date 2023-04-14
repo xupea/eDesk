@@ -93,7 +93,7 @@ export default async function ipc() {
 
   ipcMain.handle('login', async () => {
     const store = new Store();
-    const uuid = store.get('uuid') || uuidv4();
+    const uuid = (store.get('uuid') as string) || uuidv4();
     store.set('uuid', uuid);
 
     await signal.connect(uuid);
