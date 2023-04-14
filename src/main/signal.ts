@@ -18,8 +18,8 @@ class SignalEventEmitter extends EventEmitter {
     );
   }
 
-  invoke(event: string, data: any, answerEvent: string) {
-    return new Promise((resolve, reject) => {
+  invoke<T>(event: string, data: any, answerEvent: string) {
+    return new Promise<T>((resolve, reject) => {
       this.send(event, data);
 
       this.once(answerEvent, resolve);

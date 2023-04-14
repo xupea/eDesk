@@ -5,6 +5,7 @@ import { createControlWindow, sendControlWindow } from './controlWindow';
 import { sendMainWindow, showMainWindow } from './mainWindow';
 import signal from './signal';
 import { moveMouse, typeString } from './robot';
+import { MainStatus } from '../shared/types';
 
 export default async function ipc() {
   // 转发
@@ -24,33 +25,43 @@ export default async function ipc() {
   });
 
   // 傀儡端逻辑
-  signal.on('asking-control', (data) => {
-    console.log('asking-control', data);
-    // 提示用户是否接受控制
+  signal.on('asking-control', () => {
     showMainWindow();
-    sendMainWindow('control-state-change', null, 5);
+    sendMainWindow(
+      'control-state-change',
+      null,
+      MainStatus.REQUESTING_CONTROLLED
+    );
   });
 
   // 傀儡端逻辑
   ipcMain.on('control-allow', async (event, data) => {
     signal.send('control-allow', data);
-    sendMainWindow('control-state-change', null, 2);
+    sendMainWindow('control-state-change', null, MainStatus.BEING_CONTROLLED);
   });
 
   // 主控端逻辑
   ipcMain.on('control', async (event, data) => {
-    const { status } = await signal.invoke('control', data, 'control');
+    const { status } = await signal.invoke<{ status: string }>(
+      'control',
+      data,
+      'control'
+    );
 
     // 当傀儡端不可用
     if (status !== 'online') {
-      sendMainWindow('control-state-change', null, 4);
+      sendMainWindow(
+        'control-state-change',
+        null,
+        MainStatus.OPPONENT_NOT_AVAILABLE
+      );
     }
   });
 
   // 主控端逻辑
   signal.on('control-ready', (data) => {
     // 通知主窗口，控制端已经准备好
-    sendMainWindow('control-state-change', data, 1);
+    sendMainWindow('control-state-change', data, MainStatus.CONTROLLING);
     // 创建控制窗口
     createControlWindow();
   });
@@ -61,7 +72,7 @@ export default async function ipc() {
   });
 
   signal.on('control-end', (data) => {
-    sendMainWindow('control-state-change', data, 3);
+    sendMainWindow('control-state-change', data, MainStatus.CONTROL_END);
   });
 
   signal.on('offer', (data) => {
@@ -84,8 +95,14 @@ export default async function ipc() {
     const store = new Store();
     const uuid = store.get('uuid') || uuidv4();
     store.set('uuid', uuid);
+
     await signal.connect(uuid);
-    const { code } = await signal.invoke('login', null, 'logined');
+
+    const { code } = await signal.invoke<{ code: number }>(
+      'login',
+      null,
+      'logined'
+    );
     return { code, uuid };
   });
 

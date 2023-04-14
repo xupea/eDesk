@@ -2,6 +2,7 @@
 
 import path from 'path';
 import { app, BrowserWindow } from 'electron';
+import { MainStatus } from '../shared/types';
 import { resolveHtmlPath } from './util';
 import { sendMainWindow, showMainWindow } from './mainWindow';
 
@@ -43,7 +44,7 @@ const createControlWindow = async () => {
 
   controlWindow.on('close', () => {
     showMainWindow();
-    sendMainWindow('control-state-change', null, 3);
+    sendMainWindow('control-state-change', null, MainStatus.CONTROL_END);
   });
 
   controlWindow.on('closed', () => {
