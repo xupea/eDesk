@@ -2,6 +2,7 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { EventEmitter } from 'events';
+import logger from '../shared/logger';
 import InviterConnection from './connection/inviterConnection';
 
 const connection = new InviterConnection();
@@ -32,6 +33,11 @@ ipcRenderer.on('answer', (e, description) => {
 
 ipcRenderer.on('control-end', () => {
   connection.close();
+});
+
+ipcRenderer.on('candidate', (e, candidates) => {
+  logger.info('opponents candidates: ', candidates);
+  connection.addIceCandidates(candidates);
 });
 
 const electronHandler = {

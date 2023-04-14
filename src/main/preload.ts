@@ -1,6 +1,7 @@
 // Disable no-unused-vars, broken for spread args
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import InviteeConnection from './connection/inviteeConnection';
+import logger from '../shared/logger';
 
 const connection = new InviteeConnection();
 
@@ -64,7 +65,7 @@ connection.addEventListener('createAnswer', (localDescription) => {
 
 // step 3
 ipcRenderer.on('candidate', (e, candidates) => {
-  console.log(candidates);
+  logger.info('opponents candidates: ', candidates);
   connection.addIceCandidates(candidates);
 });
 
