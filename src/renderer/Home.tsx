@@ -20,13 +20,28 @@ const record: Record<MainStatus, () => ReactElement | null> = {
     return null;
   },
   [MainStatus.CONTROLLING]: function controlling() {
-    return <div>控制中</div>;
+    return (
+      <div>
+        <div>正在远程控制 000000001</div>
+        <div>已控制 4 分钟</div>
+      </div>
+    );
+  },
+  [MainStatus.REQUESTING_CONTROLL]: function controlling() {
+    return (
+      <div className="requestControl">
+        <div>正在发送控制请求</div>
+        <div>
+          <Button type="primary">取消</Button>
+        </div>
+      </div>
+    );
   },
   [MainStatus.CONTROL_END]: function controlEnd() {
     return null;
   },
   [MainStatus.BEING_CONTROLLED]: function controlled() {
-    return <div>受控中</div>;
+    return <div>正在被远控中</div>;
   },
   [MainStatus.OPPONENT_NOT_AVAILABLE]: function logged() {
     return null;
@@ -59,7 +74,7 @@ function Home() {
       return;
     }
 
-    setStatus(MainStatus.CONTROLLING);
+    setStatus(MainStatus.REQUESTING_CONTROLL);
 
     // to ipc
     window.electron.ipcRenderer.send('control', {
@@ -117,7 +132,13 @@ function Home() {
       {record[status]() || (
         <div>
           <div>本设备识别码</div>
-          <div className="code">{localCode}</div>
+          <div className="codeContainer">
+            <div className="code">{localCode}</div>
+            <Button onClick={() => navigator.clipboard.writeText(localCode)}>
+              复制
+            </Button>
+          </div>
+          <div>远程控制设备</div>
           <div className="connect">
             <Input
               placeholder="请输入伙伴识别码"
@@ -131,6 +152,7 @@ function Home() {
           </div>
         </div>
       )}
+      <div className="secureConnection">已连接安全加密链路</div>
     </div>
   );
 }

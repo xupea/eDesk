@@ -23,6 +23,10 @@ export enum MainStatus {
    */
   REQUESTING_CONTROLLED,
   /**
+   * 请求控制中
+   */
+  REQUESTING_CONTROLL,
+  /**
    * 控制中
    */
   CONTROLLING,
