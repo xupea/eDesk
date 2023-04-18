@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import { app, BrowserWindow } from 'electron';
-import { createMainWindow } from './mainWindow';
+import { createMainWindow } from './windows/masterWindow';
 import ipc from './ipc';
 
 let mainWindow: BrowserWindow | null = null;

@@ -2,9 +2,9 @@
 
 import path from 'path';
 import { app, BrowserWindow } from 'electron';
-import { MainStatus } from '../shared/types';
-import { resolveHtmlPath } from './util';
-import { sendMainWindow, showMainWindow } from './mainWindow';
+import { MainStatus } from '../../shared/types';
+import { resolveHtmlPath } from '../util';
+import { sendMainWindow, showMainWindow } from './masterWindow';
 
 let controlWindow: BrowserWindow | null = null;
 
@@ -24,8 +24,8 @@ const createControlWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
-        ? path.join(__dirname, 'preloadControl.js')
-        : path.join(__dirname, '../../.erb/dll/preloadControl.js'),
+        ? path.join(__dirname, 'slavePreload.js')
+        : path.join(__dirname, '../../../.erb/dll/slavePreload.js'),
     },
   });
 

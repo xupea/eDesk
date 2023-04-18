@@ -1,7 +1,7 @@
 // Disable no-unused-vars, broken for spread args
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-import InviteeConnection from './connection/inviteeConnection';
-import logger from '../shared/logger';
+import InviteeConnection from '../connection/inviteeConnection';
+import logger from '../../shared/logger';
 
 const connection = new InviteeConnection();
 

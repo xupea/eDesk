@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import { useEffect, useRef, useState } from 'react';
 import { Spin } from 'antd';
-import bindDOMEvents from './domEvents';
+import bindDOMEvents from '../domEvents';
 
 enum Status {
   CONNECTING = 'connecting',

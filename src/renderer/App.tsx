@@ -1,7 +1,7 @@
 import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './Home';
-import Controller from './Controller';
+import Home from './pages/Master';
+import Controller from './pages/Slave';
 import 'antd/dist/reset.css';
 import './App.css';
 

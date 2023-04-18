@@ -20,8 +20,16 @@ const configuration: webpack.Configuration = {
   target: 'electron-preload',
 
   entry: {
-    preload: path.join(webpackPaths.srcMainPath, 'preload.ts'),
-    preloadControl: path.join(webpackPaths.srcMainPath, 'preloadControl.ts'),
+    masterPreload: path.join(
+      webpackPaths.srcMainPath,
+      'windows',
+      'masterPreload.ts'
+    ),
+    slavePreload: path.join(
+      webpackPaths.srcMainPath,
+      'windows',
+      'slavePreload.ts'
+    ),
   },
 
   output: {

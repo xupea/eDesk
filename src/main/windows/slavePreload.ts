@@ -2,8 +2,8 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { EventEmitter } from 'events';
-import logger from '../shared/logger';
-import InviterConnection from './connection/inviterConnection';
+import logger from '../../shared/logger';
+import InviterConnection from '../connection/inviterConnection';
 
 const connection = new InviterConnection();
 
