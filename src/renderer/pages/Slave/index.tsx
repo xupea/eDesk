@@ -1,9 +1,10 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import { useEffect, useRef, useState } from 'react';
-import { Spin } from 'antd';
-import bindDOMEvents from '../domEvents';
+import CircleLoading from 'renderer/components/CircleLoading';
+import bindDOMEvents from '../../domEvents';
+import styles from './index.module.css';
 
-enum Status {
+export enum Status {
   CONNECTING = 'connecting',
   CONNECTED = 'connected',
 }
@@ -29,18 +30,17 @@ function Controller() {
 
   useEffect(() => {
     if (status === Status.CONNECTED) {
-      bindDOMEvents(ref.current!);
+      // bindDOMEvents(ref.current!);
     }
   }, [status]);
 
   return (
-    <div className="mainContainer">
-      {status === Status.CONNECTING && (
-        <Spin size="large">
-          <div className="content" />
-        </Spin>
-      )}
-      <video id="video" ref={ref} />
+    <div className={styles.container}>
+      <div className={styles.connecting}>
+        <CircleLoading progress={0.5} />
+        <div>正在建立远程连接...</div>
+      </div>
+      {/* <video id="video" ref={ref} /> */}
     </div>
   );
 }

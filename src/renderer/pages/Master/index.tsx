@@ -1,7 +1,7 @@
 import { useEffect, useState, ReactElement } from 'react';
 import { Input, Button, Modal } from 'antd';
 import logger from 'shared/logger';
-import { MainStatus } from '../../shared/types';
+import { MainStatus } from '../../../shared/types';
 
 const record: Record<MainStatus, () => ReactElement | null> = {
   [MainStatus.UNLOGGED]: function unloged() {
