@@ -25,11 +25,11 @@ export default async function ipc() {
   });
 
   // 傀儡端逻辑
-  signal.on('asking-control', () => {
+  signal.on('asking-control', (data) => {
     showMainWindow();
     sendMainWindow(
       'control-state-change',
-      null,
+      data,
       MainStatus.REQUESTING_CONTROLLED
     );
   });

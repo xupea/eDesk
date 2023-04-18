@@ -11,11 +11,16 @@ export enum Status {
 
 function Controller() {
   const [status, setStatus] = useState<Status>(Status.CONNECTING);
+  const [progress, setProgress] = useState(0);
 
   const ref = useRef<HTMLVideoElement>(null);
 
   const handleControl = () => {
-    setStatus(Status.CONNECTED);
+    setProgress(30);
+
+    setTimeout(() => {
+      setStatus(Status.CONNECTED);
+    }, 1000);
   };
 
   useEffect(() => {
@@ -23,24 +28,28 @@ function Controller() {
 
     window.electron.emitterOn('control-ready', handleControl);
 
+    setProgress(20);
+
     return () => {
-      window.electron.emmiterOff('control-ready', handleControl);
+      window.electron.emitterOff('control-ready', handleControl);
     };
   }, []);
 
   useEffect(() => {
     if (status === Status.CONNECTED) {
-      // bindDOMEvents(ref.current!);
+      bindDOMEvents(ref.current!);
     }
   }, [status]);
 
   return (
     <div className={styles.container}>
-      <div className={styles.connecting}>
-        <CircleLoading progress={0.5} />
-        <div>正在建立远程连接...</div>
-      </div>
-      {/* <video id="video" ref={ref} /> */}
+      {status === Status.CONNECTING && (
+        <div className={styles.connecting}>
+          <CircleLoading progress={progress} />
+          <div>正在建立远程连接...</div>
+        </div>
+      )}
+      <video id="video" ref={ref} />
     </div>
   );
 }

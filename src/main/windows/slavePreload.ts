@@ -19,10 +19,10 @@ connection.addEventListener('icecandidates', (candidates) => {
 const emmiter = new EventEmitter();
 
 connection.addEventListener('onTrack', (event) => {
-  emmiter.emit('control-ready');
   const videoElement = document.getElementById('video') as HTMLVideoElement;
   [videoElement.srcObject] = event.streams;
   videoElement.addEventListener('loadedmetadata', () => {
+    emmiter.emit('control-ready');
     videoElement.play();
   });
 });

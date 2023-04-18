@@ -86,11 +86,11 @@ function Home() {
     // to ipc
     window.electron.ipcRenderer.send('control', {
       from: parseInt(localCode, 10),
-      to: parseInt(code, 10),
+      to: parseInt(parsedCode, 10),
     });
   };
 
-  const handleControlState = (e: any, name: string, type: number) => {
+  const handleControlState = (e: any, data: any, type: number) => {
     if (type === MainStatus.CONTROLLING) {
       setStatus(MainStatus.CONTROLLING);
     } else if (type === MainStatus.BEING_CONTROLLED) {
@@ -106,6 +106,7 @@ function Home() {
         maskClosable: true,
       });
     } else if (type === MainStatus.REQUESTING_CONTROLLED) {
+      console.log(data);
       Modal.confirm({
         title: '控制请求',
         content: '有人请求控制你的电脑',
