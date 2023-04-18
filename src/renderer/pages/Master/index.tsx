@@ -1,7 +1,10 @@
 import { useEffect, useState, ReactElement } from 'react';
 import { Input, Button, Modal } from 'antd';
+import cx from 'classnames';
 import logger from 'shared/logger';
+import { codeParser, codeFormatter } from 'renderer/utils';
 import { MainStatus } from '../../../shared/types';
+import styles from './index.module.css';
 
 const record: Record<MainStatus, () => ReactElement | null> = {
   [MainStatus.UNLOGGED]: function unloged() {
@@ -68,10 +71,11 @@ function Home() {
   };
 
   const requestControl = (code: string) => {
-    if (localCode === code || !code) {
+    const parsedCode = codeParser(code);
+    if (localCode === parsedCode || !parsedCode) {
       Modal.warning({
         title: '识别码',
-        content: !code ? '识别码不能为空' : '不能连接本机识别码',
+        content: !code ? '识别码不能为空' : '请输入非本机识别码',
         maskClosable: true,
       });
       return;
@@ -117,6 +121,15 @@ function Home() {
     }
   };
 
+  const handleInputChange = (e) => {
+    const { value } = e.target;
+    const parsedValue = codeParser(value);
+    // if (parsedValue === remoteCode) {
+    //   return;
+    // }
+    setRemoteCode(codeFormatter(parsedValue));
+  };
+
   useEffect(() => {
     logger.debug('start login and get machine code');
 
@@ -133,26 +146,51 @@ function Home() {
   }, []);
 
   return (
-    <div className="mainContainer">
+    <div className={styles.container}>
       {record[status]() || (
-        <div>
-          <div>本设备识别码</div>
-          <div className="codeContainer">
-            <div className="code">{localCode}</div>
-            <Button onClick={() => navigator.clipboard.writeText(localCode)}>
-              复制
+        <div className={styles.main}>
+          <div className={styles.left}>
+            <div className={cx(styles.primaryText, styles.title)}>
+              允许控制本机
+            </div>
+            <div className={cx(styles.secondaryText, styles.label)}>
+              本设备识别码
+            </div>
+            <div
+              className={cx(
+                styles.primaryText,
+                styles.title,
+                styles.inputHeight
+              )}
+            >
+              {codeFormatter(localCode)}
+            </div>
+            <Button
+              type="primary"
+              onClick={() => navigator.clipboard.writeText(localCode)}
+            >
+              复制识别码
             </Button>
           </div>
-          <div>远程控制设备</div>
-          <div className="connect">
+          <div className={styles.middle} />
+          <div className={styles.right}>
+            <div className={cx(styles.primaryText, styles.title)}>
+              控制远程设备
+            </div>
+            <div className={cx(styles.secondaryText, styles.label)}>
+              伙伴识别码
+            </div>
             <Input
-              placeholder="请输入伙伴识别码"
-              onChange={(e) => setRemoteCode(e.target.value)}
+              placeholder="输入识别码，远程伙伴"
+              onChange={handleInputChange}
               onPressEnter={() => requestControl(remoteCode)}
+              value={codeFormatter(remoteCode)}
               allowClear
+              className={styles.input}
+              maxLength={11}
             />
             <Button type="primary" onClick={() => requestControl(remoteCode)}>
-              连接
+              远程协助
             </Button>
           </div>
         </div>

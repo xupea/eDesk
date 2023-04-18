@@ -1,0 +1,63 @@
+.container {
+  position: relative;
+  color: black;
+  height: 100vh;
+  background: white;
+  font-family: sans-serif;
+  overflow-y: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.main {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 40px;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+}
+
+.middle {
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  width: 1px;
+  height: 200px;
+}
+
+.title {
+  padding-bottom: 20px;
+}
+
+.label {
+  padding-bottom: 10px;
+}
+
+.input {
+  margin-bottom: 20px;
+}
+
+.inputHeight {
+  line-height: 32px;
+  font-size: 24px;
+}
+
+.primaryText {
+  font-size: 20px;
+}
+
+.secondaryText {
+  font-size: 14px;
+  color: gray;
+}

@@ -50,4 +50,21 @@ function throttle(method, wait, { leading = true, trailing = true } = {}) {
   return throttled;
 }
 
-export { throttle };
+function codeParser(str: string) {
+  return str.replace(/ /g, '');
+}
+
+function codeFormatter(str: string) {
+  let newStr = codeParser(str);
+  newStr = newStr.split('').reduce((acc, cur, index) => {
+    if (index % 3 === 0) {
+      acc += ` ${cur}`;
+    } else {
+      acc += cur;
+    }
+    return acc;
+  }, '');
+  return newStr.substring(1);
+}
+
+export { throttle, codeParser, codeFormatter };

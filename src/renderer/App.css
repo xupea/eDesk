@@ -48,13 +48,6 @@
   font-size: 36px;
 }
 
-.codeContainer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 0 20px;
-}
-
 .content {
   display: flex;
   flex-direction: column;
