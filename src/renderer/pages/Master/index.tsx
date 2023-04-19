@@ -1,59 +1,76 @@
 import { useEffect, useState, ReactElement } from 'react';
-import { Input, Button, Modal } from 'antd';
+import { Input, Button, Modal, message } from 'antd';
 import cx from 'classnames';
 import logger from 'shared/logger';
+import ClientStatus from 'renderer/components/ClientStatus';
 import { codeParser, codeFormatter, codePadding } from 'renderer/utils';
-import { MainStatus } from '../../../shared/types';
+import { ConnectionStatus, MainStatus } from '../../../shared/types';
 import styles from './index.module.css';
 
 const record: Record<MainStatus, () => ReactElement | null> = {
   [MainStatus.UNLOGGED]: function unloged() {
-    return <div>未登录</div>;
+    return null;
   },
   [MainStatus.LOGGING_IN]: function loggingIn() {
-    return <div>登录中</div>;
+    return null;
   },
   [MainStatus.LOGGED_IN]: function loggedIn() {
     return null;
   },
   [MainStatus.LOGGED_FAILED]: function loggedIn() {
-    return <div>登录失败</div>;
+    return null;
   },
   [MainStatus.REQUESTING_CONTROLLED]: function controlEnd() {
+    return null;
+  },
+  [MainStatus.CONTROL_END]: function controlEnd() {
+    return null;
+  },
+  [MainStatus.CONTROL_DENY]: function controlDeny() {
+    return null;
+  },
+  [MainStatus.OPPONENT_NOT_AVAILABLE]: function logged() {
     return null;
   },
   [MainStatus.CONTROLLING]: function controlling() {
     return (
       <div>
-        <div>正在远程控制 000000001</div>
+        <div>正在远程控制中...</div>
         <div>已控制 4 分钟</div>
       </div>
     );
   },
-  [MainStatus.REQUESTING_CONTROLL]: function controlling() {
+  [MainStatus.REQUESTING_CONTROLL]: function requestControlling() {
     return (
-      <div className="requestControl">
-        <div>正在发送控制请求</div>
+      <div className={styles.requestControl}>
+        <div>正在等待对方同意...</div>
         <div>
-          <Button type="primary">取消</Button>
+          <Button type="primary">取消控制</Button>
         </div>
       </div>
     );
   },
-  [MainStatus.CONTROL_END]: function controlEnd() {
-    return null;
-  },
   [MainStatus.BEING_CONTROLLED]: function controlled() {
-    return <div>正在被远控中</div>;
-  },
-  [MainStatus.OPPONENT_NOT_AVAILABLE]: function logged() {
-    return null;
+    return (
+      <div className={styles.requestControl}>
+        <div>正在被远控中...</div>
+        <div>
+          <Button type="primary">断开连接</Button>
+        </div>
+      </div>
+    );
   },
 };
 
-function Home() {
+const statusConverter = (status: MainStatus) => {
+  return status > MainStatus.LOGGED_FAILED
+    ? ConnectionStatus.CONNECTED
+    : (status as unknown as ConnectionStatus);
+};
+
+function Master() {
   const [remoteCode, setRemoteCode] = useState('');
-  const [localCode, setLocalCode] = useState('');
+  const [localCode, setLocalCode] = useState('--- --- ---');
   const [status, setStatus] = useState(MainStatus.UNLOGGED);
 
   const login = async () => {
@@ -95,11 +112,14 @@ function Home() {
       setStatus(MainStatus.CONTROLLING);
     } else if (type === MainStatus.BEING_CONTROLLED) {
       setStatus(MainStatus.BEING_CONTROLLED);
+    } else if (type === MainStatus.CONTROL_DENY) {
+      setStatus(MainStatus.CONTROL_DENY);
+      message.warning('对方拒绝了你的控制请求');
     } else if (type === MainStatus.CONTROL_END) {
       setStatus(MainStatus.CONTROL_END);
       window.electron.ipcRenderer.send('control-end');
     } else if (type === MainStatus.OPPONENT_NOT_AVAILABLE) {
-      setStatus(MainStatus.LOGGED_IN);
+      setStatus(MainStatus.OPPONENT_NOT_AVAILABLE);
       Modal.warning({
         title: '识别码',
         content: '识别码不存在或不在线',
@@ -113,6 +133,13 @@ function Home() {
         cancelText: '拒绝',
         onOk: () => {
           window.electron.ipcRenderer.send('control-allow', {
+            from: parseInt(localCode, 10),
+            to: parseInt(remoteCode, 10),
+          });
+          setStatus(MainStatus.BEING_CONTROLLED);
+        },
+        onCancel: () => {
+          window.electron.ipcRenderer.send('control-deny', {
             from: parseInt(localCode, 10),
             to: parseInt(remoteCode, 10),
           });
@@ -167,7 +194,10 @@ function Home() {
             </div>
             <Button
               type="primary"
-              onClick={() => navigator.clipboard.writeText(localCode)}
+              onClick={() => {
+                navigator.clipboard.writeText(localCode);
+                message.success('已复制');
+              }}
             >
               复制识别码
             </Button>
@@ -189,15 +219,21 @@ function Home() {
               className={styles.input}
               maxLength={11}
             />
-            <Button type="primary" onClick={() => requestControl(remoteCode)}>
+            <Button
+              disabled={!remoteCode}
+              type="primary"
+              onClick={() => requestControl(remoteCode)}
+            >
               远程协助
             </Button>
           </div>
         </div>
       )}
-      <div className="secureConnection">已连接安全加密链路</div>
+      <div className={styles.secureConnection}>
+        <ClientStatus status={statusConverter(status)} />
+      </div>
     </div>
   );
 }
 
-export default Home;
+export default Master;

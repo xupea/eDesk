@@ -37,7 +37,11 @@ export default async function ipc() {
   // 傀儡端逻辑
   ipcMain.on('control-allow', async (event, data) => {
     signal.send('control-allow', data);
-    sendMainWindow('control-state-change', null, MainStatus.BEING_CONTROLLED);
+  });
+
+  ipcMain.on('control-deny', async (event, data) => {
+    signal.send('control-deny', data);
+    sendMainWindow('control-state-change', null, MainStatus.LOGGED_IN);
   });
 
   // 主控端逻辑
@@ -73,6 +77,10 @@ export default async function ipc() {
 
   signal.on('control-end', (data) => {
     sendMainWindow('control-state-change', data, MainStatus.CONTROL_END);
+  });
+
+  signal.on('control-deny', (data) => {
+    sendMainWindow('control-state-change', data, MainStatus.CONTROL_DENY);
   });
 
   signal.on('offer', (data) => {

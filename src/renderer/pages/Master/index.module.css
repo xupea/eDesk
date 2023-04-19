@@ -61,3 +61,19 @@
   font-size: 14px;
   color: gray;
 }
+
+.requestControl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.requestControl div {
+  padding-bottom: 20px;
+}
+
+.secureConnection {
+  position: absolute;
+  left: 20px;
+  bottom: 14px;
+}

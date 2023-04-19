@@ -35,6 +35,10 @@ export enum MainStatus {
    */
   CONTROL_END,
   /**
+   * 控制被拒绝
+   */
+  CONTROL_DENY,
+  /**
    * 被控制中
    */
   BEING_CONTROLLED,
@@ -42,6 +46,13 @@ export enum MainStatus {
    * 对方不可用
    */
   OPPONENT_NOT_AVAILABLE,
+}
+
+export enum ConnectionStatus {
+  DISCONNECTED,
+  CONNECTING,
+  CONNECTED,
+  CONNECT_FAILED,
 }
 
 export enum ControllerState {}
