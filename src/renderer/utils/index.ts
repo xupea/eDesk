@@ -67,4 +67,8 @@ function codeFormatter(str: string) {
   return newStr.substring(1);
 }
 
-export { throttle, codeParser, codeFormatter };
+function codePadding(code: number) {
+  return `${code}`.padStart(9, '0');
+}
+
+export { throttle, codeParser, codeFormatter, codePadding };

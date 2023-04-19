@@ -2,7 +2,7 @@ import { useEffect, useState, ReactElement } from 'react';
 import { Input, Button, Modal } from 'antd';
 import cx from 'classnames';
 import logger from 'shared/logger';
-import { codeParser, codeFormatter } from 'renderer/utils';
+import { codeParser, codeFormatter, codePadding } from 'renderer/utils';
 import { MainStatus } from '../../../shared/types';
 import styles from './index.module.css';
 
@@ -63,7 +63,7 @@ function Home() {
     // machine code number
     const { code } = await window.electron.ipcRenderer.invoke('login');
 
-    setLocalCode(`${code}`.padStart(9, '0'));
+    setLocalCode(codePadding(code));
 
     setStatus(MainStatus.LOGGED_IN);
 
@@ -106,10 +106,9 @@ function Home() {
         maskClosable: true,
       });
     } else if (type === MainStatus.REQUESTING_CONTROLLED) {
-      console.log(data);
       Modal.confirm({
         title: '控制请求',
-        content: '有人请求控制你的电脑',
+        content: `${codePadding(data.from)} 请求控制你的电脑`,
         okText: '同意',
         cancelText: '拒绝',
         onOk: () => {
