@@ -12,6 +12,7 @@ export enum Status {
 function Controller() {
   const [status, setStatus] = useState<Status>(Status.CONNECTING);
   const [progress, setProgress] = useState(0);
+  const [isAbnormalRatio, setIsAbnormalRatio] = useState(false);
 
   const ref = useRef<HTMLVideoElement>(null);
 
@@ -28,6 +29,14 @@ function Controller() {
 
     window.electron.emitterOn('control-ready', handleControl);
 
+    window.addEventListener('resize', () => {
+      const v = document.getElementById('video') as HTMLVideoElement;
+
+      setIsAbnormalRatio(
+        window.innerWidth / window.innerHeight < v.videoWidth / v.videoHeight
+      );
+    });
+
     setProgress(20);
 
     return () => {
@@ -38,6 +47,12 @@ function Controller() {
   useEffect(() => {
     if (status === Status.CONNECTED) {
       bindDOMEvents(ref.current!);
+
+      const v = document.getElementById('video') as HTMLVideoElement;
+
+      setIsAbnormalRatio(
+        window.innerWidth / window.innerHeight < v.videoWidth / v.videoHeight
+      );
     }
   }, [status]);
 
@@ -49,7 +64,11 @@ function Controller() {
           <div>正在建立远程连接...</div>
         </div>
       )}
-      <video className={styles.video} id="video" ref={ref} />
+      <video
+        className={isAbnormalRatio ? styles.abnormalVideo : styles.video}
+        id="video"
+        ref={ref}
+      />
     </div>
   );
 }
