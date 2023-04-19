@@ -48,8 +48,20 @@ function moveMouse(data: MouseEventData) {
   }
 }
 
+const isMac = process.platform === 'darwin';
+
 function typeString(data) {
-  const { keyCode, isCompoundShift, isCompoundAlt, isCompoundCtrl } = data;
+  const {
+    keyCode,
+    isCompoundShift,
+    isCompoundAlt,
+    isCompoundCtrl,
+    isCompoundMeta,
+    masterPlatform,
+  } = data;
+
+  console.log('platform: ', masterPlatform, process.platform, isCompoundMeta);
+
   const modifiers = [];
   if (isCompoundShift) {
     modifiers.push('shift');
@@ -58,7 +70,11 @@ function typeString(data) {
     modifiers.push('alt');
   }
   if (isCompoundCtrl) {
-    modifiers.push('ctrl');
+    if (isMac) {
+      modifiers.push('command');
+    } else {
+      modifiers.push('control');
+    }
   }
 
   const parsedKey = keyCode.length > 1 ? keyCode.toLowerCase() : keyCode;

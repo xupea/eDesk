@@ -80,7 +80,7 @@ const electronHandler = {
     connection.sendData(
       JSON.stringify({
         type: 'key',
-        data,
+        data: { ...data, masterPlatform: process.platform },
       })
     );
   },

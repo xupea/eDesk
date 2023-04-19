@@ -172,6 +172,7 @@ const handleKeyupEvent = (event: KeyboardEvent) => {
     isCompoundAlt: event.altKey,
     isCompoundShift: event.shiftKey,
     isCompoundCtrl: event.ctrlKey,
+    isCompoundMeta: event.metaKey,
   });
 };
 
