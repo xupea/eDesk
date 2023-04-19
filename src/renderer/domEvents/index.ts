@@ -34,7 +34,23 @@ const handleMouseEvent = throttle((event: MouseEvent, type: MouseEventType) => {
     offsetY: Math.floor((offsetY * v.videoHeight) / v.clientHeight),
   };
 
-  // logger.debug('mouse event, ', JSON.stringify({ type, data }));
+  // abnormal screen ratio
+  const isAbnormalRatio =
+    v.clientWidth / v.clientHeight > v.videoWidth / v.videoHeight;
+  if (isAbnormalRatio) {
+    const temp = Math.floor(
+      (Math.floor((v.clientWidth * v.videoHeight) / v.clientHeight) -
+        v.clientHeight) /
+        2
+    );
+    data.offsetY = Math.floor(
+      ((offsetY - temp) * v.videoHeight) / v.clientHeight
+    );
+
+    if (offsetY < temp || offsetY > v.clientHeight + temp) {
+      return;
+    }
+  }
 
   window.electron.mouseEvent({
     type,
