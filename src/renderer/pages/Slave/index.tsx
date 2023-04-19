@@ -49,7 +49,7 @@ function Controller() {
           <div>正在建立远程连接...</div>
         </div>
       )}
-      <video id="video" ref={ref} />
+      <video className={styles.video} id="video" ref={ref} />
     </div>
   );
 }

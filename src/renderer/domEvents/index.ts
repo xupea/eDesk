@@ -179,22 +179,18 @@ const handleKeydownEvent = (event: KeyboardEvent) => {
   event.preventDefault();
   event.stopPropagation();
 
-  if (
-    ['Shift', 'Control', 'Alt', 'Meta'].includes(event.key) ||
-    event.shiftKey ||
-    event.ctrlKey ||
-    event.altKey ||
-    event.metaKey
-  ) {
-    return;
-  }
+  // if (['Shift', 'Control', 'Alt', 'Meta'].includes(event.key)) {
+  //   return;
+  // }
 
-  setState({
-    isCompoundAlt: event.altKey,
-    isCompoundShift: event.shiftKey,
-    isCompoundCtrl: event.ctrlKey,
-    isCompoundMeta: event.metaKey,
-  });
+  if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) {
+    setState({
+      isCompoundAlt: event.altKey,
+      isCompoundShift: event.shiftKey,
+      isCompoundCtrl: event.ctrlKey,
+      isCompoundMeta: event.metaKey,
+    });
+  }
 };
 
 const handleMouseLeave = (event: MouseEvent) => {
