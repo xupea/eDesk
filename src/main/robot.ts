@@ -49,22 +49,19 @@ function moveMouse(data: MouseEventData) {
 }
 
 function typeString(data) {
-  const { key, shiftKey, metaKey, altKey, ctrlKey } = data;
+  const { keyCode, isCompoundShift, isCompoundAlt, isCompoundCtrl } = data;
   const modifiers = [];
-  if (shiftKey) {
+  if (isCompoundShift) {
     modifiers.push('shift');
   }
-  if (metaKey) {
-    modifiers.push('meta');
-  }
-  if (altKey) {
+  if (isCompoundAlt) {
     modifiers.push('alt');
   }
-  if (ctrlKey) {
+  if (isCompoundCtrl) {
     modifiers.push('ctrl');
   }
 
-  const parsedKey = key.length > 1 ? key.toLowerCase() : key;
+  const parsedKey = keyCode.length > 1 ? keyCode.toLowerCase() : keyCode;
 
   robot.keyTap(parsedKey, modifiers);
 }

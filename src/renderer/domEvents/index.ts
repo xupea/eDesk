@@ -140,7 +140,66 @@ const handleMouseMove = (event: MouseEvent) => {
   );
 };
 
-const handleMouseLeave = (event: MouseEvent) => {};
+const handleKeyupEvent = (event: KeyboardEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const { isCompoundAlt, isCompoundShift, isCompoundCtrl, isCompoundMeta } =
+    getState();
+
+  if (isCompoundShift && event.key === 'Shift') {
+    setState({ isCompoundShift: false });
+    return;
+  }
+
+  if (isCompoundAlt && event.key === 'Alt') {
+    setState({ isCompoundAlt: false });
+    return;
+  }
+
+  if (isCompoundCtrl && event.key === 'Control') {
+    setState({ isCompoundCtrl: false });
+    return;
+  }
+
+  if (isCompoundMeta && event.key === 'Meta') {
+    setState({ isCompoundMeta: false });
+    return;
+  }
+
+  window.electron.keyEvent({
+    keyCode: event.key,
+    isCompoundAlt: event.altKey,
+    isCompoundShift: event.shiftKey,
+    isCompoundCtrl: event.ctrlKey,
+  });
+};
+
+const handleKeydownEvent = (event: KeyboardEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  if (
+    ['Shift', 'Control', 'Alt', 'Meta'].includes(event.key) ||
+    event.shiftKey ||
+    event.ctrlKey ||
+    event.altKey ||
+    event.metaKey
+  ) {
+    return;
+  }
+
+  setState({
+    isCompoundAlt: event.altKey,
+    isCompoundShift: event.shiftKey,
+    isCompoundCtrl: event.ctrlKey,
+    isCompoundMeta: event.metaKey,
+  });
+};
+
+const handleMouseLeave = (event: MouseEvent) => {
+  console.log(event);
+};
 
 const defaultHandler = (event: Event) => event.preventDefault();
 
@@ -156,6 +215,9 @@ export default function bindDOMEvents(el: HTMLElement) {
     dragleave: defaultHandler,
     dragend: defaultHandler,
   };
+
+  window.addEventListener('keydown', handleKeydownEvent);
+  window.addEventListener('keyup', handleKeyupEvent);
 
   Object.keys(events).forEach((event) => {
     el.addEventListener(event, events[event]);

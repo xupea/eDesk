@@ -76,6 +76,14 @@ const electronHandler = {
       })
     );
   },
+  keyEvent(data: any) {
+    connection.sendData(
+      JSON.stringify({
+        type: 'key',
+        data,
+      })
+    );
+  },
 };
 
 contextBridge.exposeInMainWorld('electron', electronHandler);
