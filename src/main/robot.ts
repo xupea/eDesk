@@ -1,4 +1,4 @@
-import robot from 'robotjs';
+import robot from 'robotjs-ex';
 
 export enum MouseEventType {
   CLICK,
