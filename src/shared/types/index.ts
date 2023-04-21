@@ -35,6 +35,10 @@ export enum MainStatus {
    */
   CONTROL_END,
   /**
+   * 取消控制
+   */
+  CONTROL_CANCEL,
+  /**
    * 控制被拒绝
    */
   CONTROL_DENY,

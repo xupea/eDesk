@@ -23,6 +23,9 @@ const record: Record<MainStatus, () => ReactElement | null> = {
   [MainStatus.REQUESTING_CONTROLLED]: function controlEnd() {
     return null;
   },
+  [MainStatus.CONTROL_CANCEL]: function controlCancel() {
+    return null;
+  },
   [MainStatus.CONTROL_END]: function controlEnd() {
     return null;
   },
@@ -45,7 +48,14 @@ const record: Record<MainStatus, () => ReactElement | null> = {
       <div className={styles.requestControl}>
         <div>正在等待对方同意...</div>
         <div>
-          <Button type="primary">取消控制</Button>
+          <Button
+            type="primary"
+            onClick={() => {
+              window.electron.ipcRenderer.send('control-cancel');
+            }}
+          >
+            取消控制
+          </Button>
         </div>
       </div>
     );
@@ -108,8 +118,13 @@ function Master() {
   };
 
   const handleControlState = (e: any, data: any, type: number) => {
+    logger.debug('handleControlState', data, type);
     if (type === MainStatus.CONTROLLING) {
       setStatus(MainStatus.CONTROLLING);
+    } else if (type === MainStatus.CONTROL_CANCEL) {
+      setStatus(MainStatus.CONTROL_CANCEL);
+      Modal.destroyAll();
+      message.info('对方取消了控制请求');
     } else if (type === MainStatus.BEING_CONTROLLED) {
       setStatus(MainStatus.BEING_CONTROLLED);
     } else if (type === MainStatus.CONTROL_DENY) {
@@ -230,7 +245,7 @@ function Master() {
       )}
       <div className={styles.secureConnection}>
         <ClientStatus status={statusConverter(status)} />
-        <div className={styles.version}>v0.0.0-alpha.1</div>
+        <div className={styles.version}>v0.0.0-alpha.2</div>
       </div>
     </div>
   );

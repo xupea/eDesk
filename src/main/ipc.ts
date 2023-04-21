@@ -45,7 +45,11 @@ export default async function ipc() {
 
   ipcMain.on('control-deny', async (event, data) => {
     signal.send('control-deny', data);
-    sendMainWindow('control-state-change', null, MainStatus.LOGGED_IN);
+    sendMainWindow('control-state-change', null, MainStatus.CONTROL_END);
+  });
+
+  signal.on('control-deny', (data) => {
+    sendMainWindow('control-state-change', data, MainStatus.CONTROL_DENY);
   });
 
   // 主控端逻辑
@@ -66,6 +70,15 @@ export default async function ipc() {
     }
   });
 
+  ipcMain.on('control-cancel', async (event, data) => {
+    signal.invoke('control-cancel', data, 'control-cancel-ack');
+    sendMainWindow('control-state-change', null, MainStatus.CONTROL_END);
+  });
+
+  signal.on('control-cancel-ack', (data) => {
+    sendMainWindow('control-state-change', data, MainStatus.CONTROL_CANCEL);
+  });
+
   // 主控端逻辑
   signal.on('control-ready', (data) => {
     // 通知主窗口，控制端已经准备好
@@ -82,10 +95,6 @@ export default async function ipc() {
   signal.on('control-end', (data) => {
     sendMainWindow('control-state-change', data, MainStatus.CONTROL_END);
     sendMainWindow('control-end', data);
-  });
-
-  signal.on('control-deny', (data) => {
-    sendMainWindow('control-state-change', data, MainStatus.CONTROL_DENY);
   });
 
   signal.on('offer', (data) => {
