@@ -48,6 +48,13 @@ export enum MainStatus {
   OPPONENT_NOT_AVAILABLE,
 }
 
+export enum SlaveStatus {
+  /**
+   * 关闭窗口
+   */
+  WINDOW_CLOSE,
+}
+
 export enum ConnectionStatus {
   DISCONNECTED,
   CONNECTING,

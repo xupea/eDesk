@@ -2,11 +2,15 @@
 
 import path from 'path';
 import { app, BrowserWindow } from 'electron';
-import { MainStatus } from '../../shared/types';
+import { MainStatus, SlaveStatus } from '../../shared/types';
 import { resolveHtmlPath } from '../util';
 import { sendMainWindow, showMainWindow } from './masterWindow';
 
 let controlWindow: BrowserWindow | null = null;
+
+const sendControlWindow = async (channel: string, ...args: any[]) => {
+  controlWindow?.webContents.send(channel, ...args);
+};
 
 const createControlWindow = async () => {
   const RESOURCES_PATH = app.isPackaged
@@ -42,11 +46,10 @@ const createControlWindow = async () => {
     }
   });
 
-  controlWindow.on('close', () => {
-    controlWindow?.webContents.send('control-end');
+  controlWindow.on('close', (event) => {
+    event.preventDefault();
 
-    showMainWindow();
-    sendMainWindow('control-state-change', null, MainStatus.CONTROL_END);
+    sendControlWindow('control-state-change', null, SlaveStatus.WINDOW_CLOSE);
   });
 
   controlWindow.on('closed', () => {
@@ -54,8 +57,10 @@ const createControlWindow = async () => {
   });
 };
 
-const sendControlWindow = async (channel: string, ...args: any[]) => {
-  controlWindow?.webContents.send(channel, ...args);
+const closeControlWindow = () => {
+  controlWindow?.destroy();
+  showMainWindow();
+  sendMainWindow('control-state-change', null, MainStatus.CONTROL_END);
 };
 
-export { createControlWindow, sendControlWindow };
+export { createControlWindow, sendControlWindow, closeControlWindow };

@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import { useEffect, useRef, useState } from 'react';
+import { Modal } from 'antd';
 import CircleLoading from 'renderer/components/CircleLoading';
 import bindDOMEvents from '../../domEvents';
 import styles from './index.module.css';
@@ -22,6 +23,18 @@ function Controller() {
     setTimeout(() => {
       setStatus(Status.CONNECTED);
     }, 1000);
+  };
+
+  const handleControlState = (e: any, data: any, type: number) => {
+    Modal.confirm({
+      title: '提示',
+      content: '确定是否要关闭控制',
+      onOk: () => {
+        e.sender.send('window-close', data, type);
+      },
+      okText: '确定',
+      cancelText: '取消',
+    });
   };
 
   useEffect(() => {
@@ -55,6 +68,17 @@ function Controller() {
       );
     }
   }, [status]);
+
+  useEffect(() => {
+    window.electron.ipcRenderer.on('control-state-change', handleControlState);
+
+    return () => {
+      window.electron.ipcRenderer.removeListener(
+        'control-state-change',
+        handleControlState
+      );
+    };
+  }, []);
 
   return (
     <div className={styles.container}>

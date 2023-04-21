@@ -1,7 +1,11 @@
 import { ipcMain, desktopCapturer, screen } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
 import Store from 'electron-store';
-import { createControlWindow, sendControlWindow } from './windows/slaveWindow';
+import {
+  closeControlWindow,
+  createControlWindow,
+  sendControlWindow,
+} from './windows/slaveWindow';
 import { sendMainWindow, showMainWindow } from './windows/masterWindow';
 import signal from './signal';
 import { moveMouse, typeString } from './robot';
@@ -122,5 +126,9 @@ export default async function ipc() {
   ipcMain.handle('getAllDisplays', async () => {
     const results = await screen.getAllDisplays();
     return results;
+  });
+
+  ipcMain.on('window-close', () => {
+    closeControlWindow();
   });
 }

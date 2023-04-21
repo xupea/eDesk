@@ -4,7 +4,7 @@
   height: 100vh;
   background: #222222;
   font-family: sans-serif;
-  overflow-y: hidden;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
