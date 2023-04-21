@@ -3,8 +3,6 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import InviteeConnection from '../connection/inviteeConnection';
 import logger from '../../shared/logger';
 
-const connection = new InviteeConnection();
-
 function isRetinaDisplay() {
   if (window.matchMedia) {
     const mq = window.matchMedia(
@@ -15,13 +13,7 @@ function isRetinaDisplay() {
   return false;
 }
 
-connection.addEventListener('datachannelMessage', (event) => {
-  const { type, data } = JSON.parse(event.data);
-  ipcRenderer.send('robot', type, {
-    ...data,
-    devicePixelRatio: isRetinaDisplay() ? window.devicePixelRatio : 1,
-  });
-});
+let connection: InviteeConnection | null = null;
 
 async function getScreenStream() {
   const deviceId = await ipcRenderer.invoke('source');
@@ -55,29 +47,40 @@ async function getScreenStream() {
 // step 1
 ipcRenderer.on('offer', async (e, offer) => {
   const gumSteam = await getScreenStream();
-  await connection.reply(offer, gumSteam);
-});
 
-// step 2
-connection.addEventListener('createAnswer', (localDescription) => {
-  ipcRenderer.send('forward', 'answer', localDescription);
+  connection = new InviteeConnection();
+
+  connection.addEventListener('datachannelMessage', (event) => {
+    const { type, data } = JSON.parse(event.data);
+    ipcRenderer.send('robot', type, {
+      ...data,
+      devicePixelRatio: isRetinaDisplay() ? window.devicePixelRatio : 1,
+    });
+  });
+
+  // step 2
+  connection.addEventListener('createAnswer', (localDescription) => {
+    ipcRenderer.send('forward', 'answer', localDescription);
+  });
+
+  // step 4
+  connection.addEventListener('icecandidates', (candidates) => {
+    console.log('invitee client candidate: ', candidates);
+    ipcRenderer.send('forward', 'puppet-candidate', candidates);
+  });
+
+  await connection.reply(offer, gumSteam);
 });
 
 // step 3
 ipcRenderer.on('candidate', (e, candidates) => {
   logger.info('opponents candidates: ', candidates);
-  connection.addIceCandidates(candidates);
-});
-
-// step 4
-connection.addEventListener('icecandidates', (candidates) => {
-  console.log('invitee client candidate: ', candidates);
-  ipcRenderer.send('forward', 'puppet-candidate', candidates);
+  connection?.addIceCandidates(candidates);
 });
 
 ipcRenderer.on('control-end', () => {
   logger.debug('invitee client connection close');
-  connection.close();
+  connection?.close();
 });
 
 const electronHandler = {
