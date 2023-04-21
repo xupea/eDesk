@@ -117,7 +117,6 @@ function Master() {
       message.warning('对方拒绝了你的控制请求');
     } else if (type === MainStatus.CONTROL_END) {
       setStatus(MainStatus.CONTROL_END);
-      window.electron.ipcRenderer.send('control-end');
     } else if (type === MainStatus.OPPONENT_NOT_AVAILABLE) {
       setStatus(MainStatus.OPPONENT_NOT_AVAILABLE);
       Modal.warning({

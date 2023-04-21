@@ -75,6 +75,11 @@ connection.addEventListener('icecandidates', (candidates) => {
   ipcRenderer.send('forward', 'puppet-candidate', candidates);
 });
 
+ipcRenderer.on('control-end', () => {
+  logger.debug('invitee client connection close');
+  connection.close();
+});
+
 const electronHandler = {
   ipcRenderer: {
     invoke(channel: string, ...args: any[]) {

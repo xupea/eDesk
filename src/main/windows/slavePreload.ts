@@ -32,6 +32,7 @@ ipcRenderer.on('answer', (e, description) => {
 });
 
 ipcRenderer.on('control-end', () => {
+  logger.debug('invitor client connection close');
   connection.close();
 });
 

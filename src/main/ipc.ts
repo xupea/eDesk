@@ -81,6 +81,7 @@ export default async function ipc() {
 
   signal.on('control-end', (data) => {
     sendMainWindow('control-state-change', data, MainStatus.CONTROL_END);
+    sendMainWindow('control-end', data);
   });
 
   signal.on('control-deny', (data) => {
@@ -128,7 +129,8 @@ export default async function ipc() {
     return results;
   });
 
-  ipcMain.on('window-close', () => {
+  ipcMain.on('window-close', async () => {
+    await signal.invoke('control-end', null);
     closeControlWindow();
   });
 }
