@@ -35,6 +35,9 @@ const record: Record<MainStatus, () => ReactElement | null> = {
   [MainStatus.OPPONENT_NOT_AVAILABLE]: function logged() {
     return null;
   },
+  [MainStatus.OPPONENT_BUSY]: function logged() {
+    return null;
+  },
   [MainStatus.CONTROLLING]: function controlling() {
     return (
       <div>
@@ -87,14 +90,19 @@ function Master() {
     logger.debug('login code runs');
     setStatus(MainStatus.LOGGING_IN);
 
-    // machine code number
-    const { code } = await window.electron.ipcRenderer.invoke('login');
+    try {
+      // machine code number
+      const { code } = await window.electron.ipcRenderer.invoke('login');
 
-    setLocalCode(codePadding(code));
+      setLocalCode(codePadding(code));
 
-    setStatus(MainStatus.LOGGED_IN);
+      setStatus(MainStatus.LOGGED_IN);
 
-    logger.debug('login code after');
+      logger.debug('login code after');
+    } catch (error) {
+      logger.error('login', error);
+      setStatus(MainStatus.LOGGED_FAILED);
+    }
   };
 
   const requestControl = (code: string) => {
@@ -137,6 +145,13 @@ function Master() {
       Modal.warning({
         title: '识别码',
         content: '识别码不存在或不在线',
+        maskClosable: true,
+      });
+    } else if (type === MainStatus.OPPONENT_BUSY) {
+      setStatus(MainStatus.OPPONENT_BUSY);
+      Modal.warning({
+        title: '识别码',
+        content: '对方正忙',
         maskClosable: true,
       });
     } else if (type === MainStatus.REQUESTING_CONTROLLED) {

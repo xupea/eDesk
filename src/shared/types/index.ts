@@ -50,6 +50,10 @@ export enum MainStatus {
    * 对方不可用
    */
   OPPONENT_NOT_AVAILABLE,
+  /**
+   * 对方忙碌
+   */
+  OPPONENT_BUSY,
 }
 
 export enum SlaveStatus {

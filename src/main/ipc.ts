@@ -54,14 +54,17 @@ export default async function ipc() {
 
   // 主控端逻辑
   ipcMain.on('control', async (event, data) => {
-    const { status } = await signal.invoke<{ status: string }>(
+    const { status } = await signal.invoke<{ status: number }>(
       'control',
       data,
       'control'
     );
 
+    if (status === 400003) {
+      sendMainWindow('control-state-change', null, MainStatus.OPPONENT_BUSY);
+    }
     // 当傀儡端不可用
-    if (status !== 'online') {
+    if (status === 400001 || status === 400002) {
       sendMainWindow(
         'control-state-change',
         null,
