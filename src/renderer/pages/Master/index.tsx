@@ -260,7 +260,7 @@ function Master() {
       )}
       <div className={styles.secureConnection}>
         <ClientStatus status={statusConverter(status)} />
-        <div className={styles.version}>v0.0.0-alpha.2</div>
+        <div className={styles.version}>v0.0.0-alpha.3</div>
       </div>
     </div>
   );

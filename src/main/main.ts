@@ -9,10 +9,37 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import { app, BrowserWindow } from 'electron';
+import path from 'path';
 import { createMainWindow } from './windows/masterWindow';
 import ipc from './ipc';
 
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('rdc', process.execPath, [
+      path.resolve(process.argv[1]),
+    ]);
+  }
+} else {
+  app.setAsDefaultProtocolClient('rdc');
+}
+
 let mainWindow: BrowserWindow | null = null;
+
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', (event, commandLine) => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+
+    if (commandLine) {
+      console.log(`Welcome Back, You arrived from: ${commandLine.pop()}`);
+    }
+  });
+}
 
 /**
  * Add event listeners...
