@@ -173,7 +173,7 @@ const handleKeyupEvent = (event: KeyboardEvent) => {
   }
 
   window.electron.keyEvent({
-    keyCode: event.key,
+    keyCode: event.keyCode,
     isCompoundAlt: event.altKey,
     isCompoundShift: event.shiftKey,
     isCompoundCtrl: event.ctrlKey,

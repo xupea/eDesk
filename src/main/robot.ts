@@ -1,4 +1,5 @@
 import robot from 'robotjs-ex';
+import vkey from 'vkey';
 
 export enum MouseEventType {
   CLICK,
@@ -55,6 +56,46 @@ function moveMouse(data: MouseEventData) {
 
 const isMac = process.platform === 'darwin';
 
+const keyMap = {
+  '<delete>': 'delete',
+  '<backspace>': 'backspace',
+  '<enter>': 'enter',
+  '<tab>': 'tab',
+  '<escape>': 'escape',
+  '<up>': 'up',
+  '<down>': 'down',
+  '<left>': 'left',
+  '<right>': 'right',
+  '<page-up>': 'pageup',
+  '<page-down>': 'pagedown',
+  '<home>': 'home',
+  '<end>': 'end',
+  '<insert>': 'insert',
+  '<caps-lock>': 'capslock',
+  '<num-1>': '1',
+  '<num-2>': '2',
+  '<num-3>': '3',
+  '<num-4>': '4',
+  '<num-5>': '5',
+  '<num-6>': '6',
+  '<num-7>': '7',
+  '<num-8>': '8',
+  '<num-9>': '9',
+  '<num-0>': '0',
+  f1: 'f1',
+  f2: 'f2',
+  f3: 'f3',
+  f4: 'f4',
+  f5: 'f5',
+  f6: 'f6',
+  f7: 'f7',
+  f8: 'f8',
+  f9: 'f9',
+  f10: 'f10',
+  f11: 'f11',
+  f12: 'f12',
+};
+
 function typeString(data) {
   const {
     keyCode,
@@ -62,10 +103,7 @@ function typeString(data) {
     isCompoundAlt,
     isCompoundCtrl,
     isCompoundMeta,
-    masterPlatform,
   } = data;
-
-  console.log('platform: ', masterPlatform, process.platform, isCompoundMeta);
 
   const modifiers = [];
   if (isCompoundShift) {
@@ -82,7 +120,19 @@ function typeString(data) {
     }
   }
 
-  const parsedKey = keyCode.length > 1 ? keyCode.toLowerCase() : keyCode;
+  if (isCompoundMeta) {
+    modifiers.push('command');
+  }
+
+  let parsedKey = vkey[keyCode].toLowerCase();
+
+  if (parsedKey.length > 1) {
+    parsedKey = keyMap[parsedKey];
+
+    if (!parsedKey) {
+      return;
+    }
+  }
 
   robot.keyTap(parsedKey, modifiers);
 }
