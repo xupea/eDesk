@@ -71,7 +71,7 @@ const keyMap = {
   '<home>': 'home',
   '<end>': 'end',
   '<insert>': 'insert',
-  '<caps-lock>': 'capslock',
+  '<space>': 'space',
   '<num-1>': '1',
   '<num-2>': '2',
   '<num-3>': '3',
