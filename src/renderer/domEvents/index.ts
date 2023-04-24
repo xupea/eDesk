@@ -12,6 +12,7 @@ function getState() {
 export enum MouseEventType {
   CLICK,
   DBLCLICK,
+  CONTEXTMENU,
   MOUSEDOWN,
   MOUSEUP,
   MOUSEMOVE,
@@ -75,6 +76,12 @@ const handleDoubleClick = (event: MouseEvent) => {
   clearTimeout(getState().preventTimer);
   setState({ preventClick: true });
   handleMouseEvent(event, MouseEventType.DBLCLICK);
+};
+/**
+ * Handler for context menu event
+ */
+const handleContextMenu = (event: MouseEvent) => {
+  handleMouseEvent(event, MouseEventType.CONTEXTMENU);
 };
 /**
  * Handler for mousedown event
@@ -201,11 +208,12 @@ const defaultHandler = (event: Event) => event.preventDefault();
 export default function bindDOMEvents(el: HTMLElement) {
   const events = {
     click: handleClick,
+    dblclick: handleDoubleClick,
+    contextmenu: handleContextMenu,
     mousedown: handleMouseDown,
     mouseup: handleMouseUp,
     mousemove: handleMouseMove,
     mouseleave: handleMouseLeave,
-    dblclick: handleDoubleClick,
     dragover: defaultHandler,
     dragleave: defaultHandler,
     dragend: defaultHandler,

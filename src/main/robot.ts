@@ -3,6 +3,7 @@ import robot from 'robotjs-ex';
 export enum MouseEventType {
   CLICK,
   DBLCLICK,
+  CONTEXTMENU,
   MOUSEDOWN,
   MOUSEUP,
   MOUSEMOVE,
@@ -29,6 +30,10 @@ function moveMouse(data: MouseEventData) {
 
   if (type === MouseEventType.DBLCLICK) {
     robot.mouseClick('left', true);
+  }
+
+  if (type === MouseEventType.CONTEXTMENU) {
+    robot.mouseClick('right', true);
   }
 
   if (type === MouseEventType.MOUSEMOVE) {

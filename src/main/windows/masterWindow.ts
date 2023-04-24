@@ -58,7 +58,7 @@ const createMainWindow = async (sid?: string) => {
     resizable: false,
   });
 
-  mainWindow.loadURL(resolveHtmlPath(`index.html?sid=${sid || ''}`));
+  mainWindow.loadURL(resolveHtmlPath(`index.html`));
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
