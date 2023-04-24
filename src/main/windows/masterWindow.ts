@@ -2,17 +2,7 @@
 
 import path from 'path';
 import { app, BrowserWindow, shell, Menu } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
 import { resolveHtmlPath } from '../util';
-
-class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -92,10 +82,6 @@ const createMainWindow = async () => {
     shell.openExternal(edata.url);
     return { action: 'deny' };
   });
-
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
 
   return mainWindow;
 };

@@ -10,6 +10,7 @@
  */
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
+import log from 'electron-log';
 import { createMainWindow } from './windows/masterWindow';
 import ipc from './ipc';
 
@@ -36,7 +37,7 @@ if (!gotTheLock) {
     }
 
     if (commandLine) {
-      console.log(`Welcome Back, You arrived from: ${commandLine.pop()}`);
+      log.info(`Welcome Back, You arrived from: ${commandLine.pop()}`);
     }
   });
 }
@@ -56,6 +57,8 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(async () => {
+    log.info('App is ready', process.argv);
+
     mainWindow = await createMainWindow();
 
     await ipc();
