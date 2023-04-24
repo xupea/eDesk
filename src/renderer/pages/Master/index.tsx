@@ -2,6 +2,7 @@ import { useEffect, useState, ReactElement } from 'react';
 import { Input, Button, Modal, message } from 'antd';
 import cx from 'classnames';
 import logger from 'shared/logger';
+import useVersion from 'renderer/hooks/useVersion';
 import ClientStatus from 'renderer/components/ClientStatus';
 import { codeParser, codeFormatter, codePadding } from 'renderer/utils';
 import { ConnectionStatus, MainStatus } from '../../../shared/types';
@@ -85,6 +86,8 @@ function Master() {
   const [remoteCode, setRemoteCode] = useState('');
   const [localCode, setLocalCode] = useState('--- --- ---');
   const [status, setStatus] = useState(MainStatus.UNLOGGED);
+
+  const [appVersion] = useVersion();
 
   const login = async () => {
     logger.debug('login code runs');
@@ -285,7 +288,7 @@ function Master() {
       )}
       <div className={styles.secureConnection}>
         <ClientStatus status={statusConverter(status)} />
-        <div className={styles.version}>v0.0.0-alpha.3</div>
+        <div className={styles.version}>v{appVersion}</div>
       </div>
     </div>
   );

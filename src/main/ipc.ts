@@ -1,4 +1,4 @@
-import { ipcMain, desktopCapturer, screen } from 'electron';
+import { ipcMain, desktopCapturer, screen, app } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
 import Store from 'electron-store';
 import {
@@ -129,6 +129,10 @@ export default async function ipc() {
       'logined'
     );
     return { code, uuid };
+  });
+
+  ipcMain.handle('app-version', () => {
+    return app.getVersion();
   });
 
   ipcMain.handle('source', async () => {
