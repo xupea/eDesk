@@ -13,6 +13,7 @@ import path from 'path';
 import log from 'electron-log';
 import { createMainWindow } from './windows/masterWindow';
 import ipc from './ipc';
+import { getParamsFromProtocol, gettParamsFromArgs } from './util';
 
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
@@ -36,8 +37,19 @@ if (!gotTheLock) {
       mainWindow.focus();
     }
 
+    // ipc
     if (commandLine) {
-      log.info(`Welcome Back, You arrived from: ${commandLine.pop()}`);
+      const rdcURL = commandLine.pop();
+
+      if (!rdcURL) {
+        return;
+      }
+
+      const params = getParamsFromProtocol(rdcURL);
+
+      if (params) {
+        mainWindow?.webContents.send('rdc-protocol', params);
+      }
     }
   });
 }
@@ -58,8 +70,9 @@ app
   .whenReady()
   .then(async () => {
     log.info('App is ready', process.argv);
+    const params = gettParamsFromArgs();
 
-    mainWindow = await createMainWindow();
+    mainWindow = await createMainWindow(params?.sid);
 
     await ipc();
 

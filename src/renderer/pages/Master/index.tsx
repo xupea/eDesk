@@ -177,6 +177,13 @@ function Master() {
     }
   };
 
+  const handleRDCProtocol = (e: any, data: any) => {
+    const { sid } = data;
+    if (sid) {
+      setRemoteCode(sid);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { value } = e.target;
     const parsedValue = codeParser(value);
@@ -199,6 +206,24 @@ function Master() {
         handleControlState
       );
     };
+  }, []);
+
+  useEffect(() => {
+    const queryParameters = new URLSearchParams(window.location.search);
+    const sid = queryParameters.get('sid');
+    if (sid) {
+      setRemoteCode(sid);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.electron.ipcRenderer.on('rdc-protocol', handleRDCProtocol);
+
+    return () =>
+      window.electron.ipcRenderer.removeListener(
+        'rdc-protocol',
+        handleRDCProtocol
+      );
   }, []);
 
   return (

@@ -11,3 +11,22 @@ export function resolveHtmlPath(htmlFileName: string) {
   }
   return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
 }
+
+export function getParamsFromProtocol(rdcUrl: string) {
+  const url = new URL(rdcUrl);
+
+  const mid = url.searchParams.get('mid');
+  const sid = url.searchParams.get('sid')?.replace('/', '');
+
+  return { mid, sid };
+}
+
+export function gettParamsFromArgs() {
+  const rdcUrl = process.argv.find((arg) => arg.includes('rdc://'));
+
+  if (!rdcUrl) {
+    return null;
+  }
+
+  return getParamsFromProtocol(rdcUrl);
+}

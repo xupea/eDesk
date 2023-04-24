@@ -31,7 +31,7 @@ const installExtensions = async () => {
 
 let mainWindow: BrowserWindow | null = null;
 
-const createMainWindow = async () => {
+const createMainWindow = async (sid?: string) => {
   if (isDebug) {
     await installExtensions();
   }
@@ -58,7 +58,7 @@ const createMainWindow = async () => {
     resizable: false,
   });
 
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
+  mainWindow.loadURL(resolveHtmlPath(`index.html?sid=${sid || ''}`));
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
