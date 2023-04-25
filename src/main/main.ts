@@ -13,7 +13,7 @@ import path from 'path';
 import log from 'electron-log';
 import { createMainWindow } from './windows/masterWindow';
 import ipc from './ipc';
-import { getParamsFromProtocol, gettParamsFromArgs } from './util';
+import { getParamsFromProtocol, getParamsFromArgs } from './util';
 import mainIPC from './ipc/mainIPC';
 import controllerIPC from './ipc/controllerIPC';
 
@@ -72,7 +72,7 @@ app
   .whenReady()
   .then(async () => {
     log.info('App is ready', process.argv);
-    const params = gettParamsFromArgs();
+    const params = getParamsFromArgs();
 
     mainWindow = await createMainWindow(params?.sid);
 

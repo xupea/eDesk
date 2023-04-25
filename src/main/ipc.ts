@@ -1,89 +1,16 @@
 import { ipcMain, desktopCapturer, screen, app } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
 import Store from 'electron-store';
-import { createControlWindow, sendControlWindow } from './windows/slaveWindow';
-import { sendMainWindow, showMainWindow } from './windows/masterWindow';
+import { sendControlWindow } from './windows/slaveWindow';
+import { sendMainWindow } from './windows/masterWindow';
 import signal from './signal';
-import { moveMouse, typeString } from './robot';
+
 import { MainStatus } from '../shared/types';
 
 export default async function ipc() {
   // 转发
   ipcMain.on('forward', (e, event, data) => {
     signal.send('forward', { event, data });
-  });
-
-  // 鼠标和键盘控制
-  ipcMain.on('robot', (e, event, data) => {
-    if (event === 'key') {
-      typeString(data);
-    }
-
-    if (event === 'mouse') {
-      moveMouse(data);
-    }
-  });
-
-  // 傀儡端逻辑
-  signal.on('asking-control', (data) => {
-    showMainWindow();
-    sendMainWindow(
-      'control-state-change',
-      data,
-      MainStatus.REQUESTING_CONTROLLED
-    );
-  });
-
-  // 傀儡端逻辑
-  ipcMain.on('control-allow', async (event, data) => {
-    signal.send('control-allow', data);
-  });
-
-  ipcMain.on('control-deny', async (event, data) => {
-    signal.send('control-deny', data);
-    sendMainWindow('control-state-change', null, MainStatus.CONTROL_END);
-  });
-
-  signal.on('control-deny', (data) => {
-    sendMainWindow('control-state-change', data, MainStatus.CONTROL_DENY);
-  });
-
-  // 主控端逻辑
-  ipcMain.on('control', async (event, data) => {
-    const { status } = await signal.invoke<{ status: number }>(
-      'control',
-      data,
-      'control'
-    );
-
-    if (status === 400003) {
-      sendMainWindow('control-state-change', null, MainStatus.OPPONENT_BUSY);
-    }
-    // 当傀儡端不可用
-    if (status === 400001 || status === 400002) {
-      sendMainWindow(
-        'control-state-change',
-        null,
-        MainStatus.OPPONENT_NOT_AVAILABLE
-      );
-    }
-  });
-
-  ipcMain.on('control-cancel', async (event, data) => {
-    signal.invoke('control-cancel', data, 'control-cancel-ack');
-    sendMainWindow('control-state-change', null, MainStatus.CONTROL_END);
-  });
-
-  signal.on('control-cancel-ack', (data) => {
-    sendMainWindow('control-state-change', data, MainStatus.CONTROL_CANCEL);
-  });
-
-  // 主控端逻辑
-  signal.on('control-ready', (data) => {
-    // 通知主窗口，控制端已经准备好
-    sendMainWindow('control-state-change', data, MainStatus.CONTROLLING);
-    // 创建控制窗口
-    createControlWindow();
   });
 
   // 主控端逻辑

@@ -25,7 +25,7 @@ export enum MainStatus {
   /**
    * 请求控制中
    */
-  REQUESTING_CONTROLL,
+  REQUESTING_CONTROL,
   /**
    * 控制中
    */
@@ -58,6 +58,10 @@ export enum MainStatus {
    * 对方忙碌
    */
   OPPONENT_BUSY,
+  /**
+   * 窗口关闭
+   */
+  WINDOW_CLOSE,
 }
 
 export enum SlaveStatus {
@@ -79,4 +83,8 @@ export enum MainIPCEvent {
    * 断开连接
    */
   STOP_BEING_CONTROLLED = 'stop-being-controlled',
+}
+
+export enum SingalEvent {
+  RECEIVE_CONTROL_REQUEST = 'receive-control-request',
 }

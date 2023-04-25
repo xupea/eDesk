@@ -6,6 +6,9 @@ import { MainStatus, SlaveStatus } from '../../shared/types';
 import { resolveHtmlPath } from '../util';
 import { sendMainWindow, showMainWindow } from './masterWindow';
 
+const isDebug =
+  process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
+
 let controlWindow: BrowserWindow | null = null;
 
 const sendControlWindow = async (channel: string, ...args: any[]) => {
@@ -47,6 +50,10 @@ const createControlWindow = async () => {
   });
 
   controlWindow.on('close', (event) => {
+    if (isDebug) {
+      return;
+    }
+
     event.preventDefault();
 
     sendControlWindow('control-state-change', null, SlaveStatus.WINDOW_CLOSE);

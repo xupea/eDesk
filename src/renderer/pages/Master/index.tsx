@@ -6,92 +6,20 @@ import useVersion from 'renderer/hooks/useVersion';
 import ClientStatus from 'renderer/components/ClientStatus';
 import { codeParser, codeFormatter, codePadding } from 'renderer/utils';
 import { ConnectionStatus, MainIPCEvent, MainStatus } from 'shared/types';
+import Controlling from 'renderer/components/Controlling';
+import RequestControlling from 'renderer/components/RequestControlling';
+import BeingControlled from 'renderer/components/BeingControlled';
 import styles from './index.module.css';
 
-const record: Record<MainStatus, () => ReactElement | null> = {
-  [MainStatus.UNLOGGED]: function unloged() {
-    return null;
-  },
-  [MainStatus.LOGGING_IN]: function loggingIn() {
-    return null;
-  },
-  [MainStatus.LOGGED_IN]: function loggedIn() {
-    return null;
-  },
-  [MainStatus.LOGGED_FAILED]: function loggedIn() {
-    return null;
-  },
-  [MainStatus.REQUESTING_CONTROLLED]: function controlEnd() {
-    return null;
-  },
-  [MainStatus.CONTROL_CANCEL]: function controlCancel() {
-    return null;
-  },
-  [MainStatus.CONTROL_END]: function controlEnd() {
-    return null;
-  },
-  [MainStatus.STOP_BEING_CONTROLLED]: function stopBeingControlled() {
-    return null;
-  },
-  [MainStatus.CONTROL_DENY]: function controlDeny() {
-    return null;
-  },
-  [MainStatus.OPPONENT_NOT_AVAILABLE]: function logged() {
-    return null;
-  },
-  [MainStatus.OPPONENT_BUSY]: function logged() {
-    return null;
-  },
+const record: Record<Partial<MainStatus>, () => ReactElement> = {
   [MainStatus.CONTROLLING]: function controlling() {
-    return (
-      <div>
-        <div>正在远程控制中...</div>
-        <div>已控制 4 分钟</div>
-      </div>
-    );
+    return <Controlling />;
   },
-  [MainStatus.REQUESTING_CONTROLL]: function requestControlling() {
-    return (
-      <div className={styles.requestControl}>
-        <div>正在等待对方同意...</div>
-        <div>
-          <Button
-            type="primary"
-            onClick={() => {
-              window.electron.ipcRenderer.send('control-cancel');
-            }}
-          >
-            取消控制
-          </Button>
-        </div>
-      </div>
-    );
+  [MainStatus.REQUESTING_CONTROL]: function requestControlling() {
+    return <RequestControlling />;
   },
   [MainStatus.BEING_CONTROLLED]: function controlled() {
-    const handleClick = () => {
-      Modal.confirm({
-        title: '提示',
-        content: '确定是否要断开控制',
-        onOk: () => {
-          window.electron.closeConnection();
-          window.electron.ipcRenderer.send(MainIPCEvent.STOP_BEING_CONTROLLED, {
-            from: 'slaved',
-          });
-        },
-        okText: '确定',
-        cancelText: '取消',
-      });
-    };
-    return (
-      <div className={styles.requestControl}>
-        <div>正在被远控中...</div>
-        <div>
-          <Button type="primary" onClick={handleClick}>
-            断开连接
-          </Button>
-        </div>
-      </div>
-    );
+    return <BeingControlled />;
   },
 };
 
@@ -138,7 +66,7 @@ function Master() {
       return;
     }
 
-    setStatus(MainStatus.REQUESTING_CONTROLL);
+    setStatus(MainStatus.REQUESTING_CONTROL);
 
     // to ipc
     window.electron.ipcRenderer.send('control', {
@@ -198,6 +126,18 @@ function Master() {
           });
         },
       });
+    } else if (type === MainStatus.WINDOW_CLOSE) {
+      Modal.confirm({
+        title: '提示',
+        content: '确定是否要断开控制',
+        onOk: () => {
+          window.electron.ipcRenderer.send(MainIPCEvent.STOP_BEING_CONTROLLED, {
+            closeWindow: true,
+          });
+        },
+        okText: '确定',
+        cancelText: '取消',
+      });
     }
   };
 
@@ -252,7 +192,7 @@ function Master() {
 
   return (
     <div className={styles.container}>
-      {record[status]() || (
+      {record[status]?.() || (
         <div className={styles.main}>
           <div className={styles.left}>
             <div className={cx(styles.primaryText, styles.title)}>
@@ -307,7 +247,7 @@ function Master() {
           </div>
         </div>
       )}
-      <div className={styles.secureConnection}>
+      <div className={styles.footer}>
         <ClientStatus status={statusConverter(status)} />
         <div className={styles.version}>v{appVersion}</div>
       </div>

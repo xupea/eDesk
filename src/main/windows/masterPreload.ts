@@ -1,5 +1,6 @@
 // Disable no-unused-vars, broken for spread args
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { clearInterval, setInterval } from 'timers';
 import InviteeConnection from '../connection/inviteeConnection';
 import logger from '../../shared/logger';
 
@@ -81,6 +82,10 @@ ipcRenderer.on('control-end', () => {
   connection?.close();
 });
 
+let duration = 0;
+// eslint-disable-next-line no-undef
+let timer: NodeJS.Timer | null = null;
+
 const electronHandler = {
   ipcRenderer: {
     invoke(channel: string, ...args: any[]) {
@@ -103,6 +108,18 @@ const electronHandler = {
   },
   closeConnection() {
     connection?.close();
+  },
+  timerStart() {
+    timer = setInterval(() => {
+      duration++;
+    }, 1000);
+  },
+  timerStop() {
+    clearInterval(Number(timer));
+  },
+  duration() {
+    duration = 0;
+    return duration;
   },
 };
 

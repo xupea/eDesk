@@ -1,0 +1,9 @@
+.requestControl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.requestControl div {
+  padding-bottom: 20px;
+}

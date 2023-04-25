@@ -3,6 +3,7 @@
 import path from 'path';
 import { app, BrowserWindow, shell, Menu } from 'electron';
 import { resolveHtmlPath } from '../util';
+import { MainStatus } from '../../shared/types';
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -30,6 +31,10 @@ const installExtensions = async () => {
 };
 
 let mainWindow: BrowserWindow | null = null;
+
+const sendMainWindow = async (channel: string, ...args: any[]) => {
+  mainWindow?.webContents.send(channel, ...args);
+};
 
 const createMainWindow = async (sid?: string) => {
   if (isDebug) {
@@ -71,6 +76,16 @@ const createMainWindow = async (sid?: string) => {
     }
   });
 
+  mainWindow.on('close', (event) => {
+    if (isDebug) {
+      return;
+    }
+
+    event.preventDefault();
+
+    sendMainWindow('control-state-change', null, MainStatus.WINDOW_CLOSE);
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
@@ -86,12 +101,12 @@ const createMainWindow = async (sid?: string) => {
   return mainWindow;
 };
 
-const sendMainWindow = async (channel: string, ...args: any[]) => {
-  mainWindow?.webContents.send(channel, ...args);
-};
-
 const showMainWindow = () => {
-  mainWindow?.show();
+  mainWindow?.focus();
 };
 
-export { createMainWindow, sendMainWindow, showMainWindow };
+const closeMainWindow = () => {
+  mainWindow?.destroy();
+};
+
+export { createMainWindow, sendMainWindow, showMainWindow, closeMainWindow };

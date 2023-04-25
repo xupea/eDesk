@@ -21,7 +21,7 @@ export function getParamsFromProtocol(rdcUrl: string) {
   return { mid, sid };
 }
 
-export function gettParamsFromArgs() {
+export function getParamsFromArgs() {
   const rdcUrl = process.argv.find((arg) => arg.includes('rdc://'));
 
   if (!rdcUrl) {
