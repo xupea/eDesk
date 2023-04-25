@@ -35,6 +35,10 @@ export enum MainStatus {
    */
   CONTROL_END,
   /**
+   * 傀儡端主动结束控制
+   */
+  STOP_BEING_CONTROLLED,
+  /**
    * 取消控制
    */
   CONTROL_CANCEL,
@@ -70,4 +74,9 @@ export enum ConnectionStatus {
   CONNECT_FAILED,
 }
 
-export enum ControllerState {}
+export enum MainIPCEvent {
+  /**
+   * 断开连接
+   */
+  STOP_BEING_CONTROLLED = 'stop-being-controlled',
+}

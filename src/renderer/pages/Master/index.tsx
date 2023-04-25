@@ -5,7 +5,7 @@ import logger from 'shared/logger';
 import useVersion from 'renderer/hooks/useVersion';
 import ClientStatus from 'renderer/components/ClientStatus';
 import { codeParser, codeFormatter, codePadding } from 'renderer/utils';
-import { ConnectionStatus, MainStatus } from '../../../shared/types';
+import { ConnectionStatus, MainIPCEvent, MainStatus } from 'shared/types';
 import styles from './index.module.css';
 
 const record: Record<MainStatus, () => ReactElement | null> = {
@@ -28,6 +28,9 @@ const record: Record<MainStatus, () => ReactElement | null> = {
     return null;
   },
   [MainStatus.CONTROL_END]: function controlEnd() {
+    return null;
+  },
+  [MainStatus.STOP_BEING_CONTROLLED]: function stopBeingControlled() {
     return null;
   },
   [MainStatus.CONTROL_DENY]: function controlDeny() {
@@ -65,11 +68,27 @@ const record: Record<MainStatus, () => ReactElement | null> = {
     );
   },
   [MainStatus.BEING_CONTROLLED]: function controlled() {
+    const handleClick = () => {
+      Modal.confirm({
+        title: '提示',
+        content: '确定是否要断开控制',
+        onOk: () => {
+          window.electron.closeConnection();
+          window.electron.ipcRenderer.send(MainIPCEvent.STOP_BEING_CONTROLLED, {
+            from: 'slaved',
+          });
+        },
+        okText: '确定',
+        cancelText: '取消',
+      });
+    };
     return (
       <div className={styles.requestControl}>
         <div>正在被远控中...</div>
         <div>
-          <Button type="primary">断开连接</Button>
+          <Button type="primary" onClick={handleClick}>
+            断开连接
+          </Button>
         </div>
       </div>
     );
@@ -143,6 +162,8 @@ function Master() {
       message.warning('对方拒绝了你的控制请求');
     } else if (type === MainStatus.CONTROL_END) {
       setStatus(MainStatus.CONTROL_END);
+    } else if (type === MainStatus.STOP_BEING_CONTROLLED) {
+      setStatus(MainStatus.STOP_BEING_CONTROLLED);
     } else if (type === MainStatus.OPPONENT_NOT_AVAILABLE) {
       setStatus(MainStatus.OPPONENT_NOT_AVAILABLE);
       Modal.warning({

@@ -27,8 +27,6 @@ async function getScreenStream() {
   const maxWidth = isRetinaDisplay() ? width * scaleFactor : width;
   const maxHeight = isRetinaDisplay() ? height * scaleFactor : height;
 
-  console.log('invitee client: ', maxWidth, maxHeight, deviceId);
-
   return navigator.mediaDevices.getUserMedia({
     audio: false,
     video: {
@@ -102,6 +100,9 @@ const electronHandler = {
     removeListener(channel: string, listener: (...args: any[]) => void) {
       ipcRenderer.removeListener(channel, listener);
     },
+  },
+  closeConnection() {
+    connection?.close();
   },
 };
 

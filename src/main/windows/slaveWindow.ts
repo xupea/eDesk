@@ -57,10 +57,10 @@ const createControlWindow = async () => {
   });
 };
 
-const closeControlWindow = () => {
+const closeControllerWindow = () => {
   controlWindow?.destroy();
   showMainWindow();
   sendMainWindow('control-state-change', null, MainStatus.CONTROL_END);
 };
 
-export { createControlWindow, sendControlWindow, closeControlWindow };
+export { createControlWindow, sendControlWindow, closeControllerWindow };

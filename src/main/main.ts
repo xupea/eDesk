@@ -14,6 +14,8 @@ import log from 'electron-log';
 import { createMainWindow } from './windows/masterWindow';
 import ipc from './ipc';
 import { getParamsFromProtocol, gettParamsFromArgs } from './util';
+import mainIPC from './ipc/mainIPC';
+import controllerIPC from './ipc/controllerIPC';
 
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
@@ -74,7 +76,11 @@ app
 
     mainWindow = await createMainWindow(params?.sid);
 
-    await ipc();
+    ipc();
+
+    mainIPC();
+
+    controllerIPC();
 
     app.on('activate', async () => {
       // On macOS it's common to re-create a window in the app when the
