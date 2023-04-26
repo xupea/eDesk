@@ -2,8 +2,8 @@ import { ipcMain } from 'electron';
 import {
   closeControllerWindow,
   createControlWindow,
-} from '../windows/slaveWindow';
-import { sendMainWindow } from '../windows/masterWindow';
+} from '../windows/controllerWindow';
+import { sendMainWindow } from '../windows/mainWindow';
 import signal from '../signal';
 import { MainStatus } from '../../shared/types';
 

@@ -11,7 +11,7 @@
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import log from 'electron-log';
-import { createMainWindow } from './windows/masterWindow';
+import { createMainWindow } from './windows/mainWindow';
 import ipc from './ipc';
 import { getParamsFromProtocol, getParamsFromArgs } from './util';
 import mainIPC from './ipc/mainIPC';

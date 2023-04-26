@@ -4,7 +4,7 @@ import {
   sendMainWindow,
   showMainWindow,
   closeMainWindow,
-} from '../windows/masterWindow';
+} from '../windows/mainWindow';
 import signal from '../signal';
 import { moveMouse, typeString } from '../robot';
 

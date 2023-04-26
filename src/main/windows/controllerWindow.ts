@@ -4,7 +4,7 @@ import path from 'path';
 import { app, BrowserWindow } from 'electron';
 import { MainStatus, SlaveStatus } from '../../shared/types';
 import { resolveHtmlPath } from '../util';
-import { sendMainWindow, showMainWindow } from './masterWindow';
+import { sendMainWindow, showMainWindow } from './mainWindow';
 
 const isDebug =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
@@ -31,8 +31,8 @@ const createControlWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
-        ? path.join(__dirname, 'slavePreload.js')
-        : path.join(__dirname, '../../../.erb/dll/slavePreload.js'),
+        ? path.join(__dirname, 'controllerPreload.js')
+        : path.join(__dirname, '../../../.erb/dll/controllerPreload.js'),
     },
   });
 

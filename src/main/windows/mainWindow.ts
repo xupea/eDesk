@@ -56,8 +56,8 @@ const createMainWindow = async (sid?: string) => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
-        ? path.join(__dirname, 'masterPreload.js')
-        : path.join(__dirname, '../../../.erb/dll/masterPreload.js'),
+        ? path.join(__dirname, 'mainPreload.js')
+        : path.join(__dirname, '../../../.erb/dll/mainPreload.js'),
     },
     maximizable: false,
     resizable: false,

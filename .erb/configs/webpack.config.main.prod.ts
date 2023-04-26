@@ -24,15 +24,15 @@ const configuration: webpack.Configuration = {
 
   entry: {
     main: path.join(webpackPaths.srcMainPath, 'main.ts'),
-    masterPreload: path.join(
+    mainPreload: path.join(
       webpackPaths.srcMainPath,
       'windows',
-      'masterPreload.ts'
+      'mainPreload.ts'
     ),
-    slavePreload: path.join(
+    controllerPreload: path.join(
       webpackPaths.srcMainPath,
       'windows',
-      'slavePreload.ts'
+      'controllerPreload.ts'
     ),
   },
 

@@ -1,8 +1,8 @@
 import { ipcMain, desktopCapturer, screen, app } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
 import Store from 'electron-store';
-import { sendControlWindow } from './windows/slaveWindow';
-import { sendMainWindow } from './windows/masterWindow';
+import { sendControlWindow } from './windows/controllerWindow';
+import { sendMainWindow } from './windows/mainWindow';
 import signal from './signal';
 
 import { MainStatus } from '../shared/types';
