@@ -23,6 +23,11 @@ const statusConverter = (status: MainStatus) => {
     : (status as unknown as ConnectionStatus);
 };
 
+function clearPrompt() {
+  Modal.destroyAll();
+  message.destroy();
+}
+
 function Master() {
   const [remoteCode, setRemoteCode] = useState('');
   const [localCode, setLocalCode] = useState('--- --- ---');
@@ -83,6 +88,7 @@ function Master() {
       setStatus(MainStatus.CONTROL_DENY);
       message.warning('对方拒绝了你的控制请求');
     } else if (type === MainStatus.CONTROL_END) {
+      clearPrompt();
       setStatus(MainStatus.CONTROL_END);
     } else if (type === MainStatus.STOP_BEING_CONTROLLED) {
       setStatus(MainStatus.STOP_BEING_CONTROLLED);
@@ -145,9 +151,7 @@ function Master() {
   const handleInputChange = (e) => {
     const { value } = e.target;
     const parsedValue = codeParser(value);
-    // if (parsedValue === remoteCode) {
-    //   return;
-    // }
+
     setRemoteCode(codeFormatter(parsedValue));
   };
 
