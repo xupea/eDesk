@@ -91,6 +91,8 @@ const handleMouseDown = (event: MouseEvent) => {
     mouseDownX: event.x,
     mouseDownY: event.y,
   });
+
+  handleMouseEvent(event, MouseEventType.DRAGBEGIN);
 };
 /**
  * Handler for mouseup event
@@ -101,47 +103,48 @@ const handleMouseUp = (event: MouseEvent) => {
     mouseUpY: event.y,
   });
 
-  const { mouseDownX, mouseDownY, mouseUpX, mouseUpY, isDragging } = getState();
+  // const { mouseDownX, mouseDownY, mouseUpX, mouseUpY, isDragging } = getState();
 
-  if (!isDragging) {
-    return;
-  }
+  // if (!isDragging) {
+  //   return;
+  // }
 
-  if (mouseDownX === mouseUpX && mouseDownY === mouseUpY) {
-    return;
-  }
+  // if (mouseDownX === mouseUpX && mouseDownY === mouseUpY) {
+  //   return;
+  // }
 
   handleMouseEvent(event, MouseEventType.DRAGEND);
-  setState({
-    isDragging: false,
-    mouseDownX: undefined,
-    mouseDownY: undefined,
-    mouseUpX: undefined,
-    mouseUpY: undefined,
-  });
+  // setState({
+  //   isDragging: false,
+  //   mouseDownX: undefined,
+  //   mouseDownY: undefined,
+  //   mouseUpX: undefined,
+  //   mouseUpY: undefined,
+  // });
 };
 
 const handleMouseMove = (event: MouseEvent) => {
-  const { isDragging, mouseDownX, mouseDownY, mouseUpX, mouseUpY } = getState();
+  // const { isDragging, mouseDownX, mouseDownY, mouseUpX, mouseUpY } = getState();
 
-  if (
-    !isDragging &&
-    typeof mouseDownX === 'number' &&
-    typeof mouseDownY === 'number' &&
-    mouseUpX === undefined &&
-    mouseUpY === undefined &&
-    Math.abs(event.x - mouseDownX) > 0 &&
-    Math.abs(event.y - mouseDownY) > 0
-  ) {
-    handleMouseEvent(event, MouseEventType.DRAGBEGIN);
-    setState({ isDragging: true });
-  }
+  // if (
+  //   !isDragging &&
+  //   typeof mouseDownX === 'number' &&
+  //   typeof mouseDownY === 'number' &&
+  //   mouseUpX === undefined &&
+  //   mouseUpY === undefined &&
+  //   Math.abs(event.x - mouseDownX) > 0 &&
+  //   Math.abs(event.y - mouseDownY) > 0
+  // ) {
+  //   handleMouseEvent(event, MouseEventType.DRAGBEGIN);
+  //   setState({ isDragging: true });
+  // }
 
   const { isDragging: isDraggingNew } = getState();
 
   handleMouseEvent(
     event,
-    isDraggingNew ? MouseEventType.DRAGMOVE : MouseEventType.MOUSEMOVE
+    // isDraggingNew ? MouseEventType.DRAGMOVE : MouseEventType.MOUSEMOVE
+    MouseEventType.DRAGMOVE
   );
 };
 
