@@ -34,7 +34,7 @@ function moveMouse(data: MouseEventData) {
   }
 
   if (type === MouseEventType.CONTEXTMENU) {
-    robot.mouseClick('right', true);
+    robot.mouseClick('right');
   }
 
   if (type === MouseEventType.MOUSEMOVE) {

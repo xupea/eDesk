@@ -11,16 +11,10 @@ import RequestControlling from 'renderer/components/RequestControlling';
 import BeingControlled from 'renderer/components/BeingControlled';
 import styles from './index.module.css';
 
-const record: Record<Partial<MainStatus>, () => ReactElement> = {
-  [MainStatus.CONTROLLING]: function controlling() {
-    return <Controlling />;
-  },
-  [MainStatus.REQUESTING_CONTROL]: function requestControlling() {
-    return <RequestControlling />;
-  },
-  [MainStatus.BEING_CONTROLLED]: function controlled() {
-    return <BeingControlled />;
-  },
+const record: Record<Partial<MainStatus>, ReactElement> = {
+  [MainStatus.CONTROLLING]: <Controlling />,
+  [MainStatus.REQUESTING_CONTROL]: <RequestControlling />,
+  [MainStatus.BEING_CONTROLLED]: <BeingControlled />,
 };
 
 const statusConverter = (status: MainStatus) => {
@@ -192,7 +186,7 @@ function Master() {
 
   return (
     <div className={styles.container}>
-      {record[status]?.() || (
+      {record[status] || (
         <div className={styles.main}>
           <div className={styles.left}>
             <div className={cx(styles.primaryText, styles.title)}>
