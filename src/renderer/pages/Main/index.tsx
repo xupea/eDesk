@@ -127,13 +127,12 @@ function Main() {
         },
       });
     } else if (type === MainStatus.WINDOW_CLOSE) {
+      Modal.destroyAll();
       Modal.confirm({
         title: '提示',
         content: '确定是否要断开控制',
         onOk: () => {
-          window.electron.ipcRenderer.send(MainIPCEvent.STOP_BEING_CONTROLLED, {
-            closeWindow: true,
-          });
+          window.electron.ipcRenderer.send(MainIPCEvent.MAIN_WINDOW_CLOSE);
         },
         okText: '确定',
         cancelText: '取消',

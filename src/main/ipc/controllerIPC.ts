@@ -51,7 +51,10 @@ export default function controllerIPC() {
 
   // 主控端窗口关闭
   ipcMain.on('window-close', async () => {
-    await signal.invoke('control-end', null);
-    closeControllerWindow();
+    try {
+      await signal.invoke('control-end', null);
+    } finally {
+      closeControllerWindow();
+    }
   });
 }

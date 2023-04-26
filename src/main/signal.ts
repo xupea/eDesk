@@ -34,7 +34,7 @@ class SignalEventEmitter extends EventEmitter {
 
       setTimeout(() => {
         reject(new Error('timeout error'));
-      }, 1115000);
+      }, 3000);
     });
   }
 

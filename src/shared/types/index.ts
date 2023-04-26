@@ -83,6 +83,10 @@ export enum MainIPCEvent {
    * 断开连接
    */
   STOP_BEING_CONTROLLED = 'stop-being-controlled',
+  /**
+   * 窗口关闭
+   */
+  MAIN_WINDOW_CLOSE = 'main-window-close',
 }
 
 export enum SingalEvent {

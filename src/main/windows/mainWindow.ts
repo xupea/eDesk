@@ -1,9 +1,10 @@
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 
 import path from 'path';
-import { app, BrowserWindow, shell, Menu } from 'electron';
+import { app, BrowserWindow, Menu } from 'electron';
 import { resolveHtmlPath } from '../util';
 import { MainStatus } from '../../shared/types';
+import globalStatus from '../status';
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -81,9 +82,12 @@ const createMainWindow = async (sid?: string) => {
       return;
     }
 
-    event.preventDefault();
-
-    sendMainWindow('control-state-change', null, MainStatus.WINDOW_CLOSE);
+    if (globalStatus.isControlling) {
+      event.preventDefault();
+      sendMainWindow('control-state-change', null, MainStatus.WINDOW_CLOSE);
+    } else {
+      app.exit();
+    }
   });
 
   mainWindow.on('closed', () => {
@@ -91,12 +95,6 @@ const createMainWindow = async (sid?: string) => {
   });
 
   Menu.setApplicationMenu(null);
-
-  // Open urls in the user's browser
-  mainWindow.webContents.setWindowOpenHandler((edata) => {
-    shell.openExternal(edata.url);
-    return { action: 'deny' };
-  });
 
   return mainWindow;
 };
@@ -106,7 +104,7 @@ const showMainWindow = () => {
 };
 
 const closeMainWindow = () => {
-  mainWindow?.destroy();
+  app.exit();
 };
 
 export { createMainWindow, sendMainWindow, showMainWindow, closeMainWindow };

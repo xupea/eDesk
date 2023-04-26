@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import globalStatus from '../status';
 
 interface EventMap {
   createOffer: RTCSessionDescriptionInit;
@@ -61,7 +62,18 @@ export class Connection {
       iceTransportPolicy: this.forceTURN ? 'relay' : undefined,
     });
 
-    rtcPeerConnection.addEventListener('connectionstatechange', () => {});
+    rtcPeerConnection.addEventListener('connectionstatechange', () => {
+      switch (rtcPeerConnection.connectionState) {
+        case 'connected':
+          globalStatus.isControlling = true;
+          break;
+        case 'disconnected':
+          globalStatus.isControlling = false;
+          break;
+        default:
+          globalStatus.isControlling = false;
+      }
+    });
     rtcPeerConnection.addEventListener('signalingstatechange', () => {});
     rtcPeerConnection.addEventListener(
       'icecandidate',
