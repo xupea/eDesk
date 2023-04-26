@@ -115,10 +115,10 @@ const electronHandler = {
     }, 1000);
   },
   timerStop() {
+    duration = 0;
     clearInterval(Number(timer));
   },
   duration() {
-    duration = 0;
     return duration;
   },
 };

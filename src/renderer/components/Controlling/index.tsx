@@ -1,16 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 function Controlling() {
   const [duration, setDuration] = useState(0);
+  const timer = useRef<number>();
 
   useEffect(() => {
     window.electron.timerStart();
 
-    setInterval(() => {
+    timer.current = setInterval(() => {
       setDuration(window.electron.duration() as number);
     }, 1000);
 
-    return () => window.electron.timerStop();
+    return () => {
+      clearInterval(timer.current);
+      window.electron.timerStop();
+    };
   }, []);
 
   return (
