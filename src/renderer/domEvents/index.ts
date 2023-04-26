@@ -42,34 +42,6 @@ const handleMouseEvent = throttle((event: MouseEvent, type: MouseEventType) => {
   });
 }, 30);
 /**
- * Handler for click event
- */
-const handleClick = (event: MouseEvent) => {
-  const { mouseDownX, mouseDownY, mouseUpX, mouseUpY } = getState();
-
-  setState({
-    mouseDownX: undefined,
-    mouseDownY: undefined,
-    mouseUpX: undefined,
-    mouseUpY: undefined,
-  });
-
-  if (mouseDownX !== mouseUpX && mouseDownY !== mouseUpY) {
-    return;
-  }
-
-  const timer = setTimeout(() => {
-    const { preventClick } = getState();
-
-    if (!preventClick) {
-      handleMouseEvent(event, MouseEventType.CLICK);
-      setState({ preventClick: false });
-    }
-  }, 200);
-
-  setState({ preventTimer: timer });
-};
-/**
  * Handler for double click event
  */
 const handleDoubleClick = (event: MouseEvent) => {
@@ -103,49 +75,11 @@ const handleMouseUp = (event: MouseEvent) => {
     mouseUpY: event.y,
   });
 
-  // const { mouseDownX, mouseDownY, mouseUpX, mouseUpY, isDragging } = getState();
-
-  // if (!isDragging) {
-  //   return;
-  // }
-
-  // if (mouseDownX === mouseUpX && mouseDownY === mouseUpY) {
-  //   return;
-  // }
-
   handleMouseEvent(event, MouseEventType.DRAGEND);
-  // setState({
-  //   isDragging: false,
-  //   mouseDownX: undefined,
-  //   mouseDownY: undefined,
-  //   mouseUpX: undefined,
-  //   mouseUpY: undefined,
-  // });
 };
 
 const handleMouseMove = (event: MouseEvent) => {
-  // const { isDragging, mouseDownX, mouseDownY, mouseUpX, mouseUpY } = getState();
-
-  // if (
-  //   !isDragging &&
-  //   typeof mouseDownX === 'number' &&
-  //   typeof mouseDownY === 'number' &&
-  //   mouseUpX === undefined &&
-  //   mouseUpY === undefined &&
-  //   Math.abs(event.x - mouseDownX) > 0 &&
-  //   Math.abs(event.y - mouseDownY) > 0
-  // ) {
-  //   handleMouseEvent(event, MouseEventType.DRAGBEGIN);
-  //   setState({ isDragging: true });
-  // }
-
-  const { isDragging: isDraggingNew } = getState();
-
-  handleMouseEvent(
-    event,
-    // isDraggingNew ? MouseEventType.DRAGMOVE : MouseEventType.MOUSEMOVE
-    MouseEventType.DRAGMOVE
-  );
+  handleMouseEvent(event, MouseEventType.DRAGMOVE);
 };
 
 const handleKeyupEvent = (event: KeyboardEvent) => {
@@ -210,7 +144,6 @@ const defaultHandler = (event: Event) => event.preventDefault();
 
 export default function bindDOMEvents(el: HTMLElement) {
   const events = {
-    click: handleClick,
     dblclick: handleDoubleClick,
     contextmenu: handleContextMenu,
     mousedown: handleMouseDown,

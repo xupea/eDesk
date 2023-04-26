@@ -25,10 +25,6 @@ function moveMouse(data: MouseEventData) {
   const { x, y, type, devicePixelRatio } = data;
   const [newX, newY] = [x / devicePixelRatio, y / devicePixelRatio];
 
-  // if (type === MouseEventType.CLICK) {
-  //   robot.mouseClick('left');
-  // }
-
   if (type === MouseEventType.DBLCLICK) {
     robot.mouseClick('left', true);
   }

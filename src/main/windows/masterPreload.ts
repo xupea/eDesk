@@ -111,7 +111,7 @@ const electronHandler = {
   },
   timerStart() {
     timer = setInterval(() => {
-      duration++;
+      duration += 1;
     }, 1000);
   },
   timerStop() {
