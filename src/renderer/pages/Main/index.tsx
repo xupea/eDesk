@@ -28,7 +28,7 @@ function clearPrompt() {
   message.destroy();
 }
 
-function Master() {
+function Main() {
   const [remoteCode, setRemoteCode] = useState('');
   const [localCode, setLocalCode] = useState('--- --- ---');
   const [status, setStatus] = useState(MainStatus.UNLOGGED);
@@ -253,4 +253,4 @@ function Master() {
   );
 }
 
-export default Master;
+export default Main;
