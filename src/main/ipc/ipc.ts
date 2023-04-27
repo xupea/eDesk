@@ -1,9 +1,10 @@
 import { ipcMain } from 'electron';
-import { sendControlWindow } from '../windows/controllerWindow';
+import {
+  closeControllerWindow,
+  sendControlWindow,
+} from '../windows/controllerWindow';
 import { sendMainWindow } from '../windows/mainWindow';
 import signal from '../signal';
-
-import { MainStatus } from '../../shared/types';
 
 export default async function ipc() {
   // 按钮关闭连接
@@ -13,8 +14,10 @@ export default async function ipc() {
   });
   // 对方关闭连接
   signal.on('control-end', (data) => {
-    sendMainWindow('control-state-change', data, MainStatus.CONTROL_END);
+    // close connection
     sendMainWindow('control-end', data);
+    // close controller window
+    closeControllerWindow(true);
   });
 
   signal.on('offer', (data) => {

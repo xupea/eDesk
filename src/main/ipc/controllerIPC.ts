@@ -54,8 +54,7 @@ export default function controllerIPC() {
     try {
       await signal.invoke('control-end', null);
     } finally {
-      sendMainWindow('control-state-change', null, MainStatus.CONTROL_END);
-      closeControllerWindow();
+      closeControllerWindow(true);
     }
   });
 }
