@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Modal } from 'antd';
 import CircleLoading from 'renderer/components/CircleLoading';
+import { MainIPCEvent } from 'shared/types';
 import bindDOMEvents from '../../domEvents';
 import styles from './index.module.css';
 
@@ -30,7 +31,7 @@ function Controller() {
       title: '提示',
       content: '确定是否要关闭控制',
       onOk: () => {
-        e.sender.send('window-close', data, type);
+        e.sender.send(MainIPCEvent.CONTROLLER_WINDOW_CLOSE, data, type);
       },
       okText: '确定',
       cancelText: '取消',

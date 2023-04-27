@@ -5,7 +5,7 @@ import {
 } from '../windows/controllerWindow';
 import { sendMainWindow } from '../windows/mainWindow';
 import signal from '../signal';
-import { MainStatus } from '../../shared/types';
+import { MainIPCEvent, MainStatus } from '../../shared/types';
 
 export default function controllerIPC() {
   // 主控端接收到傀儡端拒绝控制
@@ -50,10 +50,11 @@ export default function controllerIPC() {
   });
 
   // 主控端窗口关闭
-  ipcMain.on('window-close', async () => {
+  ipcMain.on(MainIPCEvent.CONTROLLER_WINDOW_CLOSE, async () => {
     try {
       await signal.invoke('control-end', null);
     } finally {
+      sendMainWindow('control-state-change', null, MainStatus.CONTROL_END);
       closeControllerWindow();
     }
   });

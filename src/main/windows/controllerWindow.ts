@@ -50,10 +50,6 @@ const createControlWindow = async () => {
   });
 
   controlWindow.on('close', (event) => {
-    if (isDebug) {
-      return;
-    }
-
     event.preventDefault();
 
     sendControlWindow('control-state-change', null, SlaveStatus.WINDOW_CLOSE);

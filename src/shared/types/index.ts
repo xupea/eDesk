@@ -84,9 +84,13 @@ export enum MainIPCEvent {
    */
   STOP_BEING_CONTROLLED = 'stop-being-controlled',
   /**
-   * 窗口关闭
+   * 主窗口关闭
    */
   MAIN_WINDOW_CLOSE = 'main-window-close',
+  /**
+   * 控制窗口关闭
+   */
+  CONTROLLER_WINDOW_CLOSE = 'controller-window-close',
 }
 
 export enum SingalEvent {

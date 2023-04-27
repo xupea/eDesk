@@ -78,10 +78,6 @@ const createMainWindow = async (sid?: string) => {
   });
 
   mainWindow.on('close', (event) => {
-    if (isDebug) {
-      return;
-    }
-
     if (globalStatus.isControlling) {
       event.preventDefault();
       sendMainWindow('control-state-change', null, MainStatus.WINDOW_CLOSE);
