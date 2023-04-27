@@ -5,7 +5,9 @@ const useVersion = () => {
 
   useEffect(() => {
     async function getVersion() {
-      const result = await window.electron.ipcRenderer.invoke('app-version');
+      const result = await window.electronMain.ipcRenderer.invoke(
+        'app-version'
+      );
 
       setVersion(result);
     }

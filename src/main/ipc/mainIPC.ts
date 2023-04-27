@@ -44,17 +44,16 @@ export default function mainIPC() {
       // do nothing
     }
 
-    if (closeWindow) {
-      closeMainWindow();
-      return;
-    }
-
     // 2. 更新傀儡端界面
     sendMainWindow(
       'control-state-change',
       data,
       MainStatus.STOP_BEING_CONTROLLED
     );
+
+    if (closeWindow) {
+      closeMainWindow();
+    }
   });
   // 傀儡端鼠标和键盘控制
   ipcMain.on('robot', (e, event, data) => {

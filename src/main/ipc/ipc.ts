@@ -6,10 +6,12 @@ import signal from '../signal';
 import { MainStatus } from '../../shared/types';
 
 export default async function ipc() {
+  // 按钮关闭连接
   ipcMain.on('control-end', async (event, data) => {
-    await signal.invoke('control-end', data, 'control-end');
+    // 通知对方
+    await signal.invoke('control-end', data);
   });
-
+  // 对方关闭连接
   signal.on('control-end', (data) => {
     sendMainWindow('control-state-change', data, MainStatus.CONTROL_END);
     sendMainWindow('control-end', data);

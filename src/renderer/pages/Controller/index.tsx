@@ -39,9 +39,9 @@ function Controller() {
   };
 
   useEffect(() => {
-    window.electron.startControlling();
+    window.electronController.startControlling();
 
-    window.electron.emitterOn('control-ready', handleControl);
+    window.electronController.emitterOn('control-ready', handleControl);
 
     window.addEventListener('resize', () => {
       const v = document.getElementById('video') as HTMLVideoElement;
@@ -54,7 +54,7 @@ function Controller() {
     setProgress(20);
 
     return () => {
-      window.electron.emitterOff('control-ready', handleControl);
+      window.electronController.emitterOff('control-ready', handleControl);
     };
   }, []);
 
@@ -71,10 +71,13 @@ function Controller() {
   }, [status]);
 
   useEffect(() => {
-    window.electron.ipcRenderer.on('control-state-change', handleControlState);
+    window.electronController.ipcRenderer.on(
+      'control-state-change',
+      handleControlState
+    );
 
     return () => {
-      window.electron.ipcRenderer.removeListener(
+      window.electronController.ipcRenderer.removeListener(
         'control-state-change',
         handleControlState
       );

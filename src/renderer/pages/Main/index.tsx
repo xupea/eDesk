@@ -41,7 +41,7 @@ function Main() {
 
     try {
       // machine code number
-      const { code } = await window.electron.ipcRenderer.invoke('login');
+      const { code } = await window.electronMain.ipcRenderer.invoke('login');
 
       setLocalCode(codePadding(code));
 
@@ -68,7 +68,7 @@ function Main() {
     setStatus(MainStatus.REQUESTING_CONTROL);
 
     // to ipc
-    window.electron.ipcRenderer.send('control', {
+    window.electronMain.ipcRenderer.send('control', {
       from: parseInt(localCode, 10),
       to: parseInt(parsedCode, 10),
     });
@@ -113,14 +113,14 @@ function Main() {
         okText: '同意',
         cancelText: '拒绝',
         onOk: () => {
-          window.electron.ipcRenderer.send('control-allow', {
+          window.electronMain.ipcRenderer.send('control-allow', {
             from: parseInt(localCode, 10),
             to: parseInt(remoteCode, 10),
           });
           setStatus(MainStatus.BEING_CONTROLLED);
         },
         onCancel: () => {
-          window.electron.ipcRenderer.send('control-deny', {
+          window.electronMain.ipcRenderer.send('control-deny', {
             from: parseInt(localCode, 10),
             to: parseInt(remoteCode, 10),
           });
@@ -132,7 +132,7 @@ function Main() {
         title: '提示',
         content: '确定是否要断开控制',
         onOk: () => {
-          window.electron.ipcRenderer.send(MainIPCEvent.MAIN_WINDOW_CLOSE);
+          window.electronMain.ipcRenderer.send(MainIPCEvent.MAIN_WINDOW_CLOSE);
         },
         okText: '确定',
         cancelText: '取消',
@@ -159,10 +159,13 @@ function Main() {
 
     login();
 
-    window.electron.ipcRenderer.on('control-state-change', handleControlState);
+    window.electronMain.ipcRenderer.on(
+      'control-state-change',
+      handleControlState
+    );
 
     return () => {
-      window.electron.ipcRenderer.removeListener(
+      window.electronMain.ipcRenderer.removeListener(
         'control-state-change',
         handleControlState
       );
@@ -178,10 +181,10 @@ function Main() {
   }, []);
 
   useEffect(() => {
-    window.electron.ipcRenderer.on('rdc-protocol', handleRDCProtocol);
+    window.electronMain.ipcRenderer.on('rdc-protocol', handleRDCProtocol);
 
     return () =>
-      window.electron.ipcRenderer.removeListener(
+      window.electronMain.ipcRenderer.removeListener(
         'rdc-protocol',
         handleRDCProtocol
       );

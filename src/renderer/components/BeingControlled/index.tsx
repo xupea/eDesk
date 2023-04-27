@@ -8,10 +8,13 @@ function BeingControlled() {
       title: '提示',
       content: '确定是否要断开控制',
       onOk: () => {
-        window.electron.closeConnection();
-        window.electron.ipcRenderer.send(MainIPCEvent.STOP_BEING_CONTROLLED, {
-          from: 'slaved',
-        });
+        window.electronMain.closeConnection();
+        window.electronMain.ipcRenderer.send(
+          MainIPCEvent.STOP_BEING_CONTROLLED,
+          {
+            from: 'slaved',
+          }
+        );
       },
       okText: '确定',
       cancelText: '取消',

@@ -35,7 +35,7 @@ const handleMouseEvent = throttle((event: MouseEvent, type: MouseEventType) => {
     offsetY: Math.floor((offsetY * v.videoHeight) / v.clientHeight),
   };
 
-  window.electron.mouseEvent({
+  window.electronController.mouseEvent({
     type,
     x: data.offsetX,
     y: data.offsetY,
@@ -109,7 +109,7 @@ const handleKeyupEvent = (event: KeyboardEvent) => {
     return;
   }
 
-  window.electron.keyEvent({
+  window.electronController.keyEvent({
     keyCode: event.keyCode,
     isCompoundAlt: event.altKey,
     isCompoundShift: event.shiftKey,

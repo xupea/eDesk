@@ -9,7 +9,7 @@ function RequestControlling() {
         <Button
           type="primary"
           onClick={() => {
-            window.electron.ipcRenderer.send('control-cancel');
+            window.electronMain.ipcRenderer.send('control-cancel');
           }}
         >
           取消控制

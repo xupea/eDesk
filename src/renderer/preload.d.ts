@@ -1,9 +1,11 @@
-import { ElectronHandler } from 'main/windows/controllerPreload';
+import { ElectronMainHandler } from 'main/windows/mainPreload';
+import { ElectronControllerHandler } from 'main/windows/controllerPreload';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
   interface Window {
-    electron: ElectronHandler;
+    electronMain: ElectronMainHandler;
+    electronController: ElectronControllerHandler;
   }
 }
 
