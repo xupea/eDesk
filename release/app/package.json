@@ -12,8 +12,5 @@
   "scripts": {
     "postinstall": "npm run link-modules",
     "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts"
-  },
-  "dependencies": {
-    "robotjs-ex": "^0.6.5"
   }
 }

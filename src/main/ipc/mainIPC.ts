@@ -8,7 +8,7 @@ import {
   closeMainWindow,
 } from '../windows/mainWindow';
 import signal from '../signal';
-import { moveMouse, typeString } from '../robot';
+import { mouseAction, keyboardAction } from '../robot';
 
 export default function mainIPC() {
   // 傀儡端收到控制邀请
@@ -57,12 +57,13 @@ export default function mainIPC() {
   });
   // 傀儡端鼠标和键盘控制
   ipcMain.on('robot', (e, event, data) => {
-    if (event === 'key') {
-      typeString(data);
+    if (event === 'keyboard') {
+      keyboardAction(data);
     }
 
     if (event === 'mouse') {
-      moveMouse(data);
+      console.log('mouse', data);
+      mouseAction(data);
     }
   });
   // 主控端/傀儡端窗口关闭

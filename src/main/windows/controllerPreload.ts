@@ -80,7 +80,7 @@ const electronHandler = {
   keyEvent(data: any) {
     connection.sendData(
       JSON.stringify({
-        type: 'key',
+        type: 'keyboard',
         data: { ...data, masterPlatform: process.platform },
       })
     );

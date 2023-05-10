@@ -3,6 +3,7 @@
 import path from 'path';
 import { app, BrowserWindow, Menu } from 'electron';
 import { resolveHtmlPath } from '../util';
+import { createRobotjsProcess } from '../robot';
 import { MainStatus } from '../../shared/types';
 import globalStatus from '../status';
 
@@ -91,6 +92,8 @@ const createMainWindow = async (sid?: string) => {
   });
 
   Menu.setApplicationMenu(null);
+
+  createRobotjsProcess();
 
   return mainWindow;
 };

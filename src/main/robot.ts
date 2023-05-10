@@ -1,4 +1,5 @@
-import robot from 'robotjs-ex';
+import path from 'path';
+import { spawn } from 'child_process';
 import vkey from 'vkey';
 
 export enum MouseEventType {
@@ -21,33 +22,64 @@ interface MouseEventData {
   devicePixelRatio: number;
 }
 
-function moveMouse(data: MouseEventData) {
+let robotjsProcess: any;
+
+function createRobotjsProcess() {
+  if (!robotjsProcess) {
+    const robotjsBinary = path.join(__dirname, '../../assets', 'robotjs');
+    robotjsProcess = spawn(robotjsBinary);
+    robotjsProcess.stdout.on('data', (data: any) => {
+      console.log(`stdout: ${data}`);
+    });
+  }
+}
+
+function sendAction(action: string) {
+  robotjsProcess.stdin.write(`${action}\n`);
+}
+
+function mouseAction(data: MouseEventData) {
   const { x, y, type, devicePixelRatio } = data;
   const [newX, newY] = [x / devicePixelRatio, y / devicePixelRatio];
 
+  let action = '';
+  let params = '';
+
   if (type === MouseEventType.DBLCLICK) {
-    robot.mouseClick('left', true);
+    action = 'mouseClick';
+    params = ['left', true].join(',');
   }
 
   if (type === MouseEventType.CONTEXTMENU) {
-    robot.mouseClick('right');
+    action = 'mouseClick';
+    params = 'right';
   }
 
   if (type === MouseEventType.MOUSEMOVE) {
-    robot.moveMouse(newX, newY);
+    action = 'moveMouse';
+    params = [newX, newY].join(',');
   }
 
   if (type === MouseEventType.DRAGBEGIN) {
-    robot.mouseToggle('down');
+    action = 'mouseToggle';
+    params = 'down';
   }
 
   if (type === MouseEventType.DRAGMOVE) {
-    robot.dragMouse(newX, newY);
+    action = 'dragMouse';
+    params = [newX, newY].join(',');
   }
 
   if (type === MouseEventType.DRAGEND) {
-    robot.mouseToggle('up');
+    action = 'mouseToggle';
+    params = 'up';
   }
+
+  const allParams = [action, params].filter(Boolean).join(' ');
+
+  console.log('allParams: ', allParams);
+
+  sendAction(allParams);
 }
 
 const isMac = process.platform === 'darwin';
@@ -92,7 +124,7 @@ const keyMap = {
   f12: 'f12',
 };
 
-function typeString(data) {
+function keyboardAction(data: any) {
   const {
     keyCode,
     isCompoundShift,
@@ -130,7 +162,10 @@ function typeString(data) {
     }
   }
 
-  robot.keyTap(parsedKey, modifiers);
+  const params = [parsedKey, ...modifiers].filter(Boolean).join(',');
+  const allParams = ['keyTap', params].filter(Boolean).join(' ');
+
+  sendAction(allParams);
 }
 
-export { moveMouse, typeString };
+export { mouseAction, keyboardAction, createRobotjsProcess };
