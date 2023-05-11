@@ -17,3 +17,11 @@ Makefile
 *.vcxproj
 
 *.vcxproj.filters
+
+robotjs.dir
+
+x64
+
+Release
+
+Debug
